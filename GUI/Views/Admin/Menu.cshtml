@@ -1,17 +1,46 @@
 ﻿@{
     Layout = "_AdminLayout";
-    ViewData["Title"] = "Quản lý Thực đơn";
+    ViewData["Title"] = "Quản lý Món ăn";
 }
 
-<h2>Danh sách Món ăn</h2>
-<div class="table-container">
-    <table class="data-table">
-        <thead>
-            <tr><th>ID</th><th>Tên món</th><th>Giá</th><th>Loại</th><th>Trạng thái</th></tr>
+<h2 class="mb-4">🍔 Danh sách Món ăn</h2>
+
+<div class="mb-3">
+    <button class="btn btn-success">+ Thêm món mới</button>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên món</th>
+                <th>Giá</th>
+                <th>Danh mục</th>
+                <th>Hành động</th>
+            </tr>
         </thead>
         <tbody>
-            <tr><td>1</td><td>Cheese Pizza</td><td>120,000 VND</td><td>Pizza</td><td>Hoạt động</td></tr>
-            <tr><td>2</td><td>Chicken Burger</td><td>80,000 VND</td><td>Burger</td><td>Ngưng bán</td></tr>
+            <tr>
+                <td>201</td>
+                <td>Gà rán giòn</td>
+                <td>₫55,000</td>
+                <td>Món chính</td>
+                <td>
+                    <button class="btn btn-sm btn-warning">Sửa</button>
+                    <button class="btn btn-sm btn-danger">Xóa</button>
+                </td>
+            </tr>
+            <tr>
+                <td>202</td>
+                <td>Khoai tây chiên</td>
+                <td>₫25,000</td>
+                <td>Món phụ</td>
+                <td>
+                    <button class="btn btn-sm btn-warning">Sửa</button>
+                    <button class="btn btn-sm btn-danger">Xóa</button>
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>

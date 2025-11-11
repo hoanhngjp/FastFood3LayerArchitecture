@@ -1,11 +1,24 @@
-﻿@* Partial View: Top Header Admin *@
-<header class="top-header">
-    <h1 class="page-title">Chào mừng trở lại, Admin Name!</h1>
-    <div class="header-actions">
-        <button class="btn-toggle-sidebar" id="sidebarToggle">☰</button>
-        <div class="notification-icon">
-            <i class="icon-bell"></i>
-            <span class="badge-new">2</span>
+﻿@* Top Header Admin Bootstrap *@
+<header class="navbar navbar-expand-lg navbar-light bg-light shadow-sm px-3">
+    <h1 class="h5 mb-0 flex-grow-1">Welcome back, <span class="text-primary">Admin Name!</span></h1>
+
+    <div class="d-flex align-items-center">
+        <div class="position-relative me-3">
+            <i class="icon-bell fs-5"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">2</span>
+        </div>
+
+        <!-- Dropdown User -->
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Admin
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li><strong class="dropdown-item-text">Admin Name</strong></li>
+                <li><small class="dropdown-item-text text-muted">admin@example.com</small></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" asp-controller="Home" asp-action="Logout">Logout</a></li>
+            </ul>
         </div>
     </div>
 </header>

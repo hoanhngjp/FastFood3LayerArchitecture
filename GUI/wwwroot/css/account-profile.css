@@ -141,3 +141,13 @@
                 border-radius: 4px;
             }
 }
+
+#accountSidebar {
+    min-width: 220px;
+    max-width: 220px;
+}
+
+#accountMain {
+    margin-left: 220px;
+    transition: margin-left 0.3s;
+}

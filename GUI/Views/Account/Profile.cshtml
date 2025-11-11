@@ -1,26 +1,21 @@
 ﻿@{
-    ViewData["Title"] = "Thông tin cá nhân";
+    Layout = "_Layout";
+    ViewData["Title"] = "Profile";
 }
-<link rel="stylesheet" href="/css/account-profile.css" asp-append-version="true" />
-<div class="account-profile container">
-    <h2>✏️ Chỉnh sửa Thông tin cá nhân</h2>
 
-    <form class="account-form">
-        <div class="form-group">
-            <label for="name">Họ và Tên</label>
-            <input type="text" id="name" value="Nguyễn Văn A" required>
-        </div>
-
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" value="a.nguyen@example.com" disabled>
-        </div>
-
-        <div class="form-group">
-            <label for="phone">Số điện thoại</label>
-            <input type="tel" id="phone" value="090xxxxxxx">
-        </div>
-
-        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-    </form>
-</div>
+<h2>Profile</h2>
+<form>
+    <div class="mb-3">
+        <label for="fullName" class="form-label">Full Name</label>
+        <input type="text" class="form-control" id="fullName" value="John Doe">
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" value="john@example.com">
+    </div>
+    <div class="mb-3">
+        <label for="phone" class="form-label">Phone</label>
+        <input type="tel" class="form-control" id="phone" value="+1 234 567 890">
+    </div>
+    <button type="submit" class="btn btn-primary">Update Profile</button>
+</form>
