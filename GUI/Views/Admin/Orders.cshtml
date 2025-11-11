@@ -3,15 +3,37 @@
     ViewData["Title"] = "Quản lý Đơn hàng";
 }
 
-<h2>Danh sách Đơn hàng</h2>
-<div class="table-container">
-    <table class="data-table">
-        <thead>
-            <tr><th>ID</th><th>Khách hàng</th><th>Thời gian</th><th>Tổng tiền</th><th>Trạng thái</th></tr>
+<h2 class="mb-4">🧾 Danh sách Đơn hàng</h2>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Ngày đặt</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
         </thead>
         <tbody>
-            <tr><td>#2001</td><td>Nguyễn Văn D</td><td>08:30 AM</td><td>220,000 VND</td><td><span class="status completed">Hoàn thành</span></td></tr>
-            <tr><td>#2002</td><td>Trần Thị E</td><td>09:00 AM</td><td>180,000 VND</td><td><span class="status processing">Đang xử lý</span></td></tr>
+            <tr>
+                <td>#DH001</td>
+                <td>Nguyễn Văn A</td>
+                <td>2025-11-11</td>
+                <td>₫350,000</td>
+                <td><span class="badge bg-success">Hoàn tất</span></td>
+                <td><button class="btn btn-sm btn-outline-primary">Chi tiết</button></td>
+            </tr>
+            <tr>
+                <td>#DH002</td>
+                <td>Trần Thị B</td>
+                <td>2025-11-10</td>
+                <td>₫150,000</td>
+                <td><span class="badge bg-warning text-dark">Đang xử lý</span></td>
+                <td><button class="btn btn-sm btn-outline-primary">Chi tiết</button></td>
+            </tr>
         </tbody>
     </table>
 </div>

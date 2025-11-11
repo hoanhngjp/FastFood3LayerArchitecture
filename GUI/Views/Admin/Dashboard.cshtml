@@ -3,58 +3,46 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<section class="dashboard-grid">
-    <div class="stat-card">
-        <p class="stat-title">Doanh thu hôm nay</p>
-        <h3 class="stat-value primary-color">45,000,000 VND</h3>
-        <p class="stat-change success-text">+12% so với hôm qua</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-title">Đơn hàng mới</p>
-        <h3 class="stat-value">45</h3>
-        <p class="stat-change danger-text">-5% so với tuần trước</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-title">Khách hàng mới</p>
-        <h3 class="stat-value">12</h3>
-        <p class="stat-change success-text">+2 khách</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-title">Lượt đặt bàn</p>
-        <h3 class="stat-value secondary-color">8</h3>
-        <p class="stat-change success-text">Đã xác nhận</p>
-    </div>
+<h2 class="mb-4">📊 Dashboard Tổng quan</h2>
 
-    <div class="chart-box chart-revenue">
-        <h4 class="box-header">Doanh thu 7 ngày gần nhất</h4>
-        <div class="chart-placeholder">
-            <p class="text-muted">Biểu đồ Doanh thu sẽ được hiển thị tại đây</p>
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Tổng đơn hàng</h5>
+                <h3 class="fw-bold text-primary">1,248</h3>
+            </div>
         </div>
     </div>
-
-    <div class="list-box top-selling-box">
-        <h4 class="box-header">Món ăn bán chạy nhất</h4>
-        <ul>
-            <li><span class="item-name">Supper Delicious Burger</span><span class="item-count primary-bg">150</span></li>
-            <li><span class="item-name">Classic French Fries</span><span class="item-count primary-bg">120</span></li>
-            <li><span class="item-name">Coca-Cola Zero</span><span class="item-count primary-bg">95</span></li>
-            <li><span class="item-name">Chicken Tenders</span><span class="item-count primary-bg">80</span></li>
-        </ul>
-    </div>
-
-    <div class="list-box recent-orders-box">
-        <h4 class="box-header">Đơn hàng gần đây</h4>
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr><th>ID</th><th>Khách hàng</th><th>Thời gian</th><th>Tổng tiền</th><th>Trạng thái</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>#1001</td><td>Nguyễn Văn A</td><td>10:45 AM</td><td>350,000 VND</td><td><span class="status completed">Hoàn thành</span></td></tr>
-                    <tr><td>#1002</td><td>Trần Thị B</td><td>11:00 AM</td><td>125,000 VND</td><td><span class="status processing">Đang xử lý</span></td></tr>
-                    <tr><td>#1003</td><td>Lê Văn C</td><td>11:05 AM</td><td>500,000 VND</td><td><span class="status cancelled">Đã hủy</span></td></tr>
-                </tbody>
-            </table>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Khách hàng</h5>
+                <h3 class="fw-bold text-success">532</h3>
+            </div>
         </div>
     </div>
-</section>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Doanh thu tháng</h5>
+                <h3 class="fw-bold text-warning">₫75.2M</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Món ăn</h5>
+                <h3 class="fw-bold text-danger">124</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-4">
+
+<h4>📈 Biểu đồ doanh thu</h4>
+<div class="text-center text-secondary">
+    <em>(Nội dung biểu đồ sẽ được thêm sau...)</em>
+</div>

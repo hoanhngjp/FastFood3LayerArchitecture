@@ -11,6 +11,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const searchSubmitBtn = document.querySelector("[data-search-submit-btn]");
     const searchCloseBtn = document.querySelector("[data-search-close-btn]");
 
+    // === User dropdown ===
+    const userToggleBtn = document.getElementById('userMenuToggle');
+    const userDropdown = document.getElementById('userMenuDropdown');
+
     if (!header) return; // nếu không có header, thoát
 
     // ================= Navbar toggle =================
@@ -49,7 +53,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const images = document.querySelectorAll("img");
 
     images.forEach(img => {
-        // Nếu hình đã load xong (cached), xử lý ngay
         if (img.complete) {
             handleImageLoad(img);
         } else {
@@ -58,8 +61,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function handleImageLoad(img) {
-        // Ví dụ: remove placeholder, add class loaded, animation...
         img.classList.add("loaded");
-        img.removeAttribute("data-placeholder"); // nếu dùng placeholder
+        img.removeAttribute("data-placeholder");
     }
+
+    // ================= User dropdown toggle =================
+    userToggleBtn?.addEventListener("click", function (e) {
+        e.stopPropagation(); // tránh click lan ra document
+        userDropdown?.classList.toggle("show");
+    });
+
+    document.addEventListener("click", function () {
+        userDropdown?.classList.remove("show");
+    });
 });

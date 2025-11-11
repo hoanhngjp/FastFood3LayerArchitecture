@@ -3,16 +3,40 @@
     ViewData["Title"] = "Quản lý Khách hàng";
 }
 
-<h2>Danh sách Khách hàng</h2>
-<div class="table-container">
-    <table class="data-table">
-        <thead>
-            <tr><th>ID</th><th>Tên</th><th>Email</th><th>Điện thoại</th></tr>
+<h2 class="mb-4">👤 Danh sách Khách hàng</h2>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên</th>
+                <th>Email</th>
+                <th>Điện thoại</th>
+                <th>Hành động</th>
+            </tr>
         </thead>
         <tbody>
-            <tr><td>101</td><td>Nguyễn Văn A</td><td>a@example.com</td><td>0901234567</td></tr>
-            <tr><td>102</td><td>Trần Thị B</td><td>b@example.com</td><td>0912345678</td></tr>
+            <tr>
+                <td>101</td>
+                <td>Nguyễn Văn A</td>
+                <td>a@example.com</td>
+                <td>0901234567</td>
+                <td>
+                    <button class="btn btn-sm btn-primary">Xem</button>
+                    <button class="btn btn-sm btn-danger">Xóa</button>
+                </td>
+            </tr>
+            <tr>
+                <td>102</td>
+                <td>Trần Thị B</td>
+                <td>b@example.com</td>
+                <td>0912345678</td>
+                <td>
+                    <button class="btn btn-sm btn-primary">Xem</button>
+                    <button class="btn btn-sm btn-danger">Xóa</button>
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>
-

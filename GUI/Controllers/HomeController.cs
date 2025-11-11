@@ -1,6 +1,7 @@
+using GUI.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using GUI.Models;
 using System.Linq;
 
 namespace GUI.Controllers
@@ -48,6 +49,16 @@ namespace GUI.Controllers
         {
             return View();
         }
+
+        public IActionResult Logout()
+        {
+            // Xoá session, cookie, hoặc sign-out user
+            HttpContext.SignOutAsync(); // nếu dùng Identity
+
+            // Chuyển về Login
+            return RedirectToAction("Login", "Home");
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

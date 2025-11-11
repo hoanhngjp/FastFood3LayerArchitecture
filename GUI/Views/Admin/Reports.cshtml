@@ -1,15 +1,32 @@
 ﻿@{
     Layout = "_AdminLayout";
-    ViewData["Title"] = "Báo cáo & Thống kê";
+    ViewData["Title"] = "Báo cáo Doanh thu";
 }
 
-<h2>Báo cáo Doanh thu tháng</h2>
-<div class="chart-box chart-revenue">
-    <p class="text-muted">Biểu đồ doanh thu theo ngày sẽ được hiển thị tại đây</p>
+<h2 class="mb-4">📈 Báo cáo & Thống kê</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Doanh thu tháng này</h5>
+                <p class="display-6 text-success fw-bold">₫75,200,000</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Số đơn hàng</h5>
+                <p class="display-6 text-primary fw-bold">1,248</p>
+            </div>
+        </div>
+    </div>
 </div>
 
-<h2>Top món bán chạy</h2>
-<ul>
-    <li>Cheese Pizza - 150 đơn</li>
-    <li>Chicken Burger - 120 đơn</li>
-</ul>
+<hr class="my-4">
+
+<div class="text-center text-secondary">
+    <em>Biểu đồ doanh thu theo tháng sẽ được tích hợp sau...</em>
+</div>

@@ -1,51 +1,52 @@
-﻿@* Partial View: Sidebar Admin *@
-<div class="sidebar">
-    <div class="foodie-logo">Foodie Admin</div>
+﻿@* Sidebar Admin Bootstrap *@
+<nav id="sidebarMenu" class="d-lg-block bg-dark text-white" style="width:220px; min-height:100vh;">
+    <button id="toggleButton" class="btn btn-outline-light mt-2 ms-2">☰</button>
 
-    <ul class="nav-list">
-        <li>
-            <a asp-controller="Admin" asp-action="Dashboard" class="nav-item active">
-                <i class="icon-dashboard"></i> Dashboard
-            </a>
-        </li>
-        <li>
-            <a asp-controller="Admin" asp-action="Orders" class="nav-item">
-                <i class="icon-orders"></i> Quản lý Đơn hàng
-            </a>
-        </li>
-        <li>
-            <a asp-controller="Admin" asp-action="Menu" class="nav-item">
-                <i class="icon-menu"></i> Quản lý Thực đơn
-            </a>
-        </li>
-        <li>
-            <a asp-controller="Admin" asp-action="Customers" class="nav-item">
-                <i class="icon-users"></i> Quản lý Khách hàng
-            </a>
-        </li>
-        <li>
-            <a asp-controller="Admin" asp-action="Reservations" class="nav-item">
-                <i class="icon-reservation"></i> Quản lý Đặt bàn
-            </a>
-        </li>
-        <li>
-            <a asp-controller="Admin" asp-action="Reports" class="nav-item">
-                <i class="icon-stats"></i> Báo cáo & Thống kê
-            </a>
-        </li>
-        <li class="spacer"></li>
-        <li>
-            <a asp-controller="Admin" asp-action="Setting" class="nav-item settings">
-                <i class="icon-settings"></i> Cài đặt
-            </a>
-        </li>
-    </ul>
+    <div class="position-sticky pt-3">
+        <div class="text-center border-bottom pb-3">
+            <h4 class="text-warning mb-0">Foodie Admin</h4>
+        </div>
 
-    <div class="admin-profile">
-        <img src="/images/admin-avatar.png" alt="Admin Avatar">
-        <div>
-            <div class="admin-name">Admin Name</div>
-            <small>Quản trị viên</small>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a class="nav-link text-white active" asp-controller="Admin" asp-action="Dashboard">
+                    <i class="icon-dashboard me-2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" asp-controller="Admin" asp-action="Orders">
+                    <i class="icon-orders me-2"></i> Orders
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" asp-controller="Admin" asp-action="Menu">
+                    <i class="icon-menu me-2"></i> Menu
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" asp-controller="Admin" asp-action="Customers">
+                    <i class="icon-users me-2"></i> Customers
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" asp-controller="Admin" asp-action="Reports">
+                    <i class="icon-stats me-2"></i> Reports
+                </a>
+            </li>
+        </ul>
+
+        <div class="border-top mt-4 pt-3 px-3 d-flex align-items-center">
+            <img src="/images/admin-avatar.png" class="rounded-circle me-2" width="40" height="40" />
+            <div>
+                <div class="fw-bold">Admin Name</div>
+                <small class="text-muted">Quản trị viên</small>
+            </div>
+        </div>
+
+        <div class="mt-3 px-3">
+            <a class="btn btn-outline-light w-100" asp-controller="Admin" asp-action="Setting">
+                <i class="icon-settings me-2"></i> Settings
+            </a>
         </div>
     </div>
-</div>
+</nav>
