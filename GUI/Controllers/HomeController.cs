@@ -34,9 +34,19 @@ namespace GUI.Controllers
             return View("~/Views/Registry/Index.cshtml");
         }
 
-        public IActionResult Reservation()
+        public IActionResult ProductDetail()
         {
-            return View("~/Views/Reservation/Index.cshtml");
+            return View();
+        }
+
+        public IActionResult ComboDetail()
+        {
+            return View();
+        }
+
+        public IActionResult Cart()
+        {
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

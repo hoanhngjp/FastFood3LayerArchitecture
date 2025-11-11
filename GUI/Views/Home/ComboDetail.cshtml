@@ -1,0 +1,77 @@
+﻿@{
+    Layout = "_Layout";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Combo Siêu Tiết Kiệm</title>
+    <link rel="stylesheet" href="/css/combodetail.css">
+    <link rel="stylesheet" href="/css/product-detail.css">
+    <link rel="stylesheet" href="/css/cart.css">
+</head>
+<body>
+
+    <section class="section product-detail-section combo-detail-section">
+        <div class="combo-body-wrapper">
+
+            <div class="product-image-area combo-main-image">
+                <img src="/images/about-banner.png" alt="Combo Burger with Drinks" class="product-main-image">
+            </div>
+
+            <div class="product-info-area combo-items-list">
+
+                <h2 class="h3 items-list-title">Thành phần bao gồm:</h2>
+
+                <ul class="combo-list">
+                    <li class="combo-item">
+                        <ion-icon name="checkmark-circle" class="combo-check"></ion-icon>
+                        <span class="combo-item-qty">1x</span>
+                        <span class="combo-item-name">Pizza Hải Sản Cỡ Lớn</span>
+                        <span class="combo-item-price">($25.00)</span>
+                    </li>
+                    <li class="combo-item">
+                        <ion-icon name="checkmark-circle" class="combo-check"></ion-icon>
+                        <span class="combo-item-qty">2x</span>
+                        <span class="combo-item-name">Burger King Whopper</span>
+                        <span class="combo-item-price">($14.00)</span>
+                    </li>
+                    <li class="combo-item">
+                        <ion-icon name="checkmark-circle" class="combo-check"></ion-icon>
+                        <span class="combo-item-qty">4x</span>
+                        <span class="combo-item-name">Nước Ngọt (Coca Cola/Pepsi)</span>
+                        <span class="combo-item-price">($12.00)</span>
+                    </li>
+                </ul>
+
+                <div class="price-wrapper detail-price combo-price-summary">
+                    <p class="price-text">Giá gốc (mua lẻ): <del class="price-old">$51.00</del></p>
+                    <p class="price-text">Giá Combo Siêu Ưu Đãi:</p>
+                    <data class="price-current" value="35.70">$35.70</data>
+                </div>
+
+                <div class="cart-action-group">
+                    <div class="quantity-control">
+                        <button class="qty-btn">-</button>
+                        <input type="text" value="1" min="1" class="qty-input">
+                        <button class="qty-btn">+</button>
+                    </div>
+
+                    <button class="btn add-to-cart-btn">
+                        Thêm vào giỏ hàng
+                    </button>
+                   
+               </div>
+
+                <a href="/#food-menu" class="btn btn-continue">
+                    Tiếp tục chọn món
+                </a>
+
+            </div>
+
+        </div>
+    </section>
+
+</body>
+</html>

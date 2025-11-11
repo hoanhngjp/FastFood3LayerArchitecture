@@ -1,0 +1,115 @@
+﻿@{
+    Layout = "_Layout";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Thanh Toán</title>
+    <link rel="stylesheet" href="/css/checkout.css">
+</head>
+<body>
+
+    <div class="checkout-container">
+        <div class="checkout-header">
+            <h2>Thanh toán</h2>
+            <p>Vui lòng kiểm tra thông tin Khách hàng, thông tin Giỏ hàng trước khi Đặt hàng.</p>
+        </div>
+
+        <div class="checkout-body">
+
+            <div class="customer-info">
+                <h3>Thông tin khách hàng</h3>
+                <form id="customer-form">
+                    <div class="form-group">
+                        <label for="ho-ten">Họ tên</label>
+                        <input type="text" id="ho-ten" value="Dương Nguyễn Phú Cường">
+                    </div>
+                    <div class="form-group">
+                        <label for="gioi-tinh">Giới tính</label>
+                        <input type="text" id="gioi-tinh" value="Nam">
+                    </div>
+                    <div class="form-group">
+                        <label for="dia-chi">Địa chỉ</label>
+                        <input type="text" id="dia-chi" value="130 Xô Viết Nghệ Tĩnh">
+                    </div>
+                    <div class="form-group">
+                        <label for="dien-thoai">Điện thoại</label>
+                        <input type="tel" id="dien-thoai" value="0915659223">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="ngay-sinh">Ngày sinh</label>
+                        <input type="text" id="ngay-sinh" value="11/6/1989">
+                    </div>
+                    <div class="form-group">
+                        <label for="cmnd">CMND</label>
+                        <input type="text" id="cmnd" value="362209685">
+                    </div>
+                </form>
+
+                <h3>Hình thức thanh toán</h3>
+                <form id="payment-form">
+                    <div class="payment-option">
+                        <input type="radio" id="tien-mat" name="payment-method" value="tien-mat" checked>
+                        <label for="tien-mat">Tiền mặt</label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" id="chuyen-khoan" name="payment-method" value="chuyen-khoan">
+                        <label for="chuyen-khoan">VN PAY</label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" id="ship-cod" name="payment-method" value="ship-cod">
+                        <label for="ship-cod">Ship COD</label>
+                    </div>
+                    <a asp-controller="Checkout" asp-action="Success" class="btn-order">Đặt hàng</a>
+                </form>
+            </div>
+
+            <div class="cart-summary">
+                <h3>Giỏ hàng <span class="cart-badge">3</span></h3>
+
+                <ul class="cart-list">
+                    <li class="cart-item">
+                        <div class="item-details">
+                            <span class="item-name">Pizza</span>
+                            <span class="item-qty">120.000 x 2</span>
+                        </div>
+                        <span class="item-price">240.000</span>
+                    </li>
+                    <li class="cart-item">
+                        <div class="item-details">
+                            <span class="item-name">Pasta</span>
+                            <span class="item-qty">70.000 x 9</span>
+                        </div>
+                        <span class="item-price">630.000</span>
+                    </li>
+                    <li class="cart-item">
+                        <div class="item-details">
+                            <span class="item-name">Hamburger</span>
+                            <span class="item-qty">60.000đ x 3</span>
+                        </div>
+                        <span class="item-price">180.000</span>
+                    </li>
+                </ul>
+
+                <div class="total-summary">
+                    <span>Tổng thanh toán</span>
+                    <strong>1.050.000</strong>
+                </div>
+
+                <form class="promo-form">
+                    <label for="promo-code">Mã khuyến mãi</label>
+                    <div class="promo-input">
+                        <input type="text" id="promo-code" placeholder="Mã khuyến mãi">
+                        <button type="button" class="btn-promo">Xác nhận</button>
+                    </div>
+                </form>
+            </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+﻿@{
+    
+    Layout = "_Layout"; 
+}
+<link rel="stylesheet" href="/css/restaurant-style.css">
+<div id="wrapper">
+
+    <nav id="restaurant-sidebar" class="sidebar">
+
+        <button id="toggleButton" class="btn-toggle-sidebar">☰</button>
+
+        <div class="sidebar-content" style="margin-top: 50px;">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="~/Restaurant/Index">
+                        Trang Chủ Nhà Hàng
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="~/Restaurant/Orders">
+                        Quản Lý Đơn Hàng
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="~/Restaurant/OrderDetail">
+                        Chi Tiết Đơn Hàng (Test)
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        @RenderBody()
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.getElementById('toggleButton');
+            const sidebar = document.getElementById('restaurant-sidebar');
+            const mainContent = document.querySelector('.main-content');
+
+           
+
+            toggleButton.addEventListener('click', function() {
+                // Thêm/Bỏ class 'collapsed' cho Sidebar
+                sidebar.classList.toggle('collapsed');
+
+   
+            });
+        });
+    </script>
+}

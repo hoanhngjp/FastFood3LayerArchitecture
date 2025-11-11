@@ -1,0 +1,143 @@
+﻿/* --- CSS cho Layout Tài khoản (account-profile.css) --- */
+
+:root {
+    --primary-color: #ff7f50; /* Màu cam/san hô, lấy cảm hứng từ theme Foodie */
+    --secondary-bg: #f8f9fa; /* Nền xám nhạt */
+    --card-bg: #ffffff; /* Nền thẻ màu trắng */
+    --text-color: #495057; /* Màu chữ chính */
+    --border-color: #e9ecef; /* Màu đường viền */
+}
+
+/* Khu vực chung */
+.account-dashboard {
+    padding: 40px 15px;
+    background-color: var(--secondary-bg);
+}
+
+    .account-dashboard h2 {
+        color: #343a40;
+        margin-bottom: 5px;
+    }
+
+    .account-dashboard p {
+        color: var(--text-color);
+    }
+
+/* --- Cấu trúc Flexbox Chính --- */
+.account-grid {
+    display: flex;
+    flex-wrap: wrap; /* Cho phép xuống dòng trên mobile */
+    gap: 30px;
+    margin-top: 30px;
+}
+
+/* --- Menu Điều hướng Tài khoản --- */
+.account-nav-menu {
+    flex: 0 0 250px; /* Chiều rộng cố định 250px cho menu */
+    background-color: var(--card-bg);
+    padding: 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    height: fit-content; /* Đảm bảo menu không dài quá nội dung */
+}
+
+    .account-nav-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .account-nav-menu li {
+        padding: 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+        .account-nav-menu li:last-child {
+            border-bottom: none;
+        }
+
+        .account-nav-menu li a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+            .account-nav-menu li a:hover {
+                background-color: #f0f0f0;
+                color: #333;
+            }
+
+        .account-nav-menu li.active {
+            background-color: var(--primary-color);
+            border-radius: 8px 8px 0 0; /* Bo góc trên cho item active đầu tiên */
+        }
+
+            .account-nav-menu li.active a {
+                color: var(--card-bg);
+                font-weight: bold;
+                background-color: transparent; /* Loại bỏ hover khi active */
+            }
+
+/* --- Khu vực Nội dung (Tổng quan nhanh) --- */
+.account-content {
+    flex-grow: 1;
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+    .account-content h3 {
+        font-size: 24px;
+        color: #343a40;
+        border-bottom: 2px solid var(--primary-color);
+        display: inline-block;
+        padding-bottom: 5px;
+        margin-bottom: 20px;
+    }
+
+    .account-content p {
+        line-height: 1.8;
+        margin-bottom: 15px;
+    }
+
+    .account-content .btn-link {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+/* --- Responsive cho mobile --- */
+@media (max-width: 768px) {
+    .account-grid {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .account-nav-menu {
+        flex: 1 1 100%; /* Chiếm toàn bộ chiều rộng */
+    }
+
+        .account-nav-menu ul {
+            display: flex; /* Biến menu thành hàng ngang cuộn (hoặc xếp chồng) */
+            flex-wrap: wrap;
+        }
+
+        .account-nav-menu li {
+            flex: 1 1 auto; /* Phân chia đều */
+            border-right: 1px solid var(--border-color);
+            border-bottom: none;
+            text-align: center;
+        }
+
+            .account-nav-menu li:last-child {
+                border-right: none;
+            }
+
+            .account-nav-menu li.active {
+                border-radius: 4px;
+            }
+}

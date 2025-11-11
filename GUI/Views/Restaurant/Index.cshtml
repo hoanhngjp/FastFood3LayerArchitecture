@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Dashboard Nhà hàng";
+    Layout = "_RestaurantLayout"; 
+}
+
+<div class="restaurant-dashboard">
+    <h2>🍳 Bảng điều khiển Nhà hàng</h2>
+    <p class="dashboard-subtitle">Theo dõi hoạt động đơn hàng theo thời gian thực.</p>
+
+    <div class="stats-cards-grid">
+        <div class="stat-card new-orders-card" style="border-left-color: #ffc107;">
+            <p class="card-title">Đơn hàng Mới (Hôm nay)</p>
+            <h3 class="card-value">12</h3>
+            <a asp-action="Orders" class="btn-link">Xem chi tiết &rarr;</a>
+        </div>
+
+        <div class="stat-card processing-orders-card" style="border-left-color: #007bff;">
+            <p class="card-title">Đang Chế biến</p>
+            <h3 class="card-value">5</h3>
+            <span class="card-trend">Thời gian chờ TB: 15 phút</span>
+        </div>
+
+        <div class="stat-card completed-orders-card" style="border-left-color: #4CAF50;">
+            <p class="card-title">Đã Hoàn thành (Giờ trước)</p>
+            <h3 class="card-value">8</h3>
+            <span class="card-trend">Độ chính xác: 98%</span>
+        </div>
+
+        <div class="stat-card popular-product-card" style="border-left-color: #6f42c1;">
+            <p class="card-title">Món bán chạy nhất</p>
+            <h3 class="card-value">Fried Chicken (x20)</h3>
+            <span class="card-trend">Hôm nay</span>
+        </div>
+    </div>
+
+    <div class="live-orders-summary">
+        <h3>Các Đơn hàng mới nhất</h3>
+        <p>Đây là khu vực hiển thị bảng đơn hàng trực tiếp (giống như trang Orders).</p>
+    </div>
+</div>
