@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Lịch sử Đơn hàng";
+}
+<link rel="stylesheet" href="/css/account-profile.css" asp-append-version="true" />
+<div class="account-orders container">
+    <h2>🧾 Lịch sử Đơn hàng</h2>
+
+    <div class="order-list-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Mã Đơn</th>
+                    <th>Ngày Đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>#20250012</td>
+                    <td>20/11/2025</td>
+                    <td>$49.00</td>
+                    <td><span class="status-badge status-shipping">Đang giao</span></td>
+                    <td><a asp-action="OrderDetail" asp-route-id="12">Xem chi tiết</a></td>
+                </tr>
+                <tr>
+                    <td>#20250011</td>
+                    <td>15/11/2025</td>
+                    <td>$108.00</td>
+                    <td><span class="status-badge status-completed">Đã hoàn thành</span></td>
+                    <td><a asp-action="OrderDetail" asp-route-id="11">Xem chi tiết</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

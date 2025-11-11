@@ -1,0 +1,130 @@
+﻿@{
+    Layout = "_Layout";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng của bạn</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/cart.css">
+</head>
+<body>
+
+    <section class="section cart-section">
+        <div class="container cart-container">
+
+            <h2 class="h2 section-title">
+                Giỏ hàng của bạn <span class="span">(3 sản phẩm)</span>
+            </h2>
+
+            <div class="cart-content-wrapper">
+
+                <div class="cart-items-list">
+
+                    <div class="cart-item">
+                        <div class="item-details-left">
+                            <img src="/images/food-menu-1.png" alt="Fried Chicken Unlimited" class="item-img">
+                            <div class="item-info">
+                                <h3 class="item-title">Fried Chicken Unlimited</h3>
+                                <p class="item-category">Gà</p>
+                                <button class="btn-remove">Xóa</button>
+                            </div>
+                        </div>
+
+                        <div class="item-details-right">
+                            <div class="quantity-control">
+                                <button class="qty-btn" disabled>-</button>
+                                <input type="number" value="1" min="1" class="qty-input">
+                                <button class="qty-btn">+</button>
+                            </div>
+                            <div class="item-price">
+                                <data class="price-current" value="49.00">$49.00</data>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cart-item">
+                        <div class="item-details-left">
+                            <img src="/images/food-menu-2.png" alt="Burger King Whopper" class="item-img">
+                            <div class="item-info">
+                                <h3 class="item-title">Burger King Whopper</h3>
+                                <p class="item-category">Mì</p>
+                                <button class="btn-remove">Xóa</button>
+                            </div>
+                        </div>
+
+                        <div class="item-details-right">
+                            <div class="quantity-control">
+                                <button class="qty-btn">-</button>
+                                <input type="number" value="2" min="1" class="qty-input">
+                                <button class="qty-btn">+</button>
+                            </div>
+                            <div class="item-price">
+                                <data class="price-current" value="58.00">$58.00</data>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cart-item">
+                        <div class="item-details-left">
+                            <img src="/images/food-menu-3.png" alt="White Castle Pizzas" class="item-img">
+                            <div class="item-info">
+                                <h3 class="item-title">White Castle Pizzas</h3>
+                                <p class="item-category">Pizza</p>
+                                <button class="btn-remove">Xóa</button>
+                            </div>
+                        </div>
+
+                        <div class="item-details-right">
+                            <div class="quantity-control">
+                                <button class="qty-btn">-</button>
+                                <input type="number" value="1" min="1" class="qty-input">
+                                <button class="qty-btn">+</button>
+                            </div>
+                            <div class="item-price">
+                                <data class="price-current" value="49.00">$49.00</data>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="cart-summary-area">
+                    <h3 class="summary-title">Tóm tắt Đơn hàng</h3>
+
+                    <div class="summary-line">
+                        <span>Tổng tiền hàng (3 món)</span>
+                        <strong>$156.00</strong>
+                    </div>
+                    <div class="summary-line">
+                        <span>Phí giao hàng</span>
+                        <strong>$5.00</strong>
+                    </div>
+                    <div class="summary-line coupon-line">
+                        <span>Mã giảm giá</span>
+                        <strong>-$10.00</strong>
+                    </div>
+
+                    <div class="summary-total">
+                        <span>Tổng thanh toán</span>
+                        <strong class="total-price">$151.00</strong>
+                    </div>
+
+                    <a href="/Checkout" class="btn btn-checkout">
+                        Tiến hành Thanh toán
+                    </a>
+
+                    <a href="/#food-menu" class="btn btn-continue">
+                        Tiếp tục chọn món
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+</body>
+</html>

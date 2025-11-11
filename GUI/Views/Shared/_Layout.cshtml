@@ -20,12 +20,8 @@
                 </ul>
             </nav>
             <div class="header-btn-group">
-                <button class="search-btn" aria-label="Search" data-search-btn>
-                    <ion-icon name="search-outline"></ion-icon>
-                </button>
-                <button class="btn btn-hover" onclick="location.href='@Url.Action("Reservation", "Home")'">Reservation</button>
-                <a asp-controller="Home" asp-action="Login" class="header-link">Đăng nhập</a>
-                <a asp-controller="Home" asp-action="Registry" class="header-link">Đăng ký</a>
+                <button class="btn btn-hover" onclick="location.href='@Url.Action("Login", "Home")'">Login</button>
+                <button class="btn btn-hover" onclick="location.href='@Url.Action("Registry", "Home")'">Registry</button>
                 <button class="nav-toggle-btn" aria-label="Toggle Menu" data-menu-toggle-btn>
                     <span class="line top"></span>
                     <span class="line middle"></span>

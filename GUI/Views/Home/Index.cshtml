@@ -1,9 +1,8 @@
-﻿
+﻿@{
+    Layout = "_Layout";
+}
 <!DOCTYPE html>
 <html lang="en">
-@{
-        Layout = "_Layout";
-}
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -77,8 +76,7 @@
                         <h2 class="h1 hero-title">Supper delicious Burger in Saigon!</h2>
 
                         <p class="hero-text">Food is any substance consumed to provide nutritional support for an organism.</p>
-
-                        <button class="btn">Book A Table</button>
+       
 
                     </div>
 
@@ -317,11 +315,8 @@
                             </li>
 
                         </ul>
-
-                        <button class="btn btn-hover">Order Now</button>
-
+                    <button class="btn btn-hover" onclick="location.href='@Url.Action("ComboDetail", "Home")'">Order Now</button>
                     </div>
-
                 </div>
             </section>
 
@@ -381,7 +376,7 @@
 
                                     <div class="badge">-15%</div>
 
-                                    <button class="btn food-menu-btn">Order Now</button>
+                                <a href="/Home/ProductDetail/1" class="btn food-menu-btn">Order Now</a>
                                 </div>
 
                                 <div class="wrapper">

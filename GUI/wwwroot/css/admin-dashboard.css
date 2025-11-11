@@ -1,63 +1,6 @@
-﻿/* Khai báo Font & Màu sắc */
-:root {
-    /* Font được lấy từ link Google Fonts bạn cung cấp */
-    --font-primary: 'Rubik', sans-serif;
-    --font-script: 'Shadows Into Light', cursive;
-    /* Màu cam đất từ nút Reservation */
-    --color-foodie-primary: #ff6e40;
-    /* Màu cam nhạt hơn cho nền/hover */
-    --color-foodie-secondary: #fff5e6;
-    --color-text-dark: #333;
-    --color-text-muted: #777;
-    --color-white: #fff;
-    --color-bg-light: #f9f9f9;
-}
-
-/* Base Styles */
-* {
-    box-sizing: border-box;
-}
-
-body {
-    font-family: var(--font-primary);
-    background-color: var(--color-bg-light);
-    color: var(--color-text-dark);
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-}
-
-/* Tiện ích màu sắc */
-.primary-color {
-    color: var(--color-foodie-primary);
-}
-
-.primary-bg {
-    background-color: var(--color-foodie-primary);
-    color: var(--color-white);
-}
-
-.secondary-color {
-    color: #ffa726;
-}
-/* Sắc thái cam khác */
-.success-text {
-    color: #4CAF50;
-}
-
-.danger-text {
-    color: #F44336;
-}
-
-/* ------------------- Sửa Sidebar cho hiệu ứng Hover ------------------- */
-.dashboard-wrapper {
-    display: flex;
-    min-height: 100vh;
-    /* Loại bỏ overflow-x: hidden để xem phần hiển thị của sidebar */
-}
-
+﻿/* Sidebar Desktop Toggle */
 .sidebar {
-    width: 220px; /* nhỏ hơn 1 chút */
+    width: 220px;
     background-color: var(--color-white);
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
@@ -69,310 +12,34 @@ body {
     left: 0;
     z-index: 1000;
     height: 100vh;
-    font-size: 0.875rem; /* cỡ chữ nhỏ hơn */
 }
 
-    /* Hiệu ứng: Hiện ra khi trỏ chuột vào Sidebar */
-    .sidebar:hover {
-        transform: translateX(0); /* Dịch chuyển về vị trí ban đầu (hiện ra) */
+    /* Khi toggle */
+    .sidebar.collapsed {
+        transform: translateX(0); /* hiện ra */
     }
 
-/* ------------------- Điều chỉnh Nội dung chính ------------------- */
-.main-content {
-    flex-grow: 1;
-    padding: 20px 30px;
-    /* Thêm padding/margin bên trái để nội dung không bị sidebar che mất */
-    margin-left: 40px; /* Bằng với phần sidebar còn lại khi ẩn */
-}
-
-/* Logo Foodie Admin (Phần chữ) */
-.foodie-logo {
-    font-family: var(--font-script);
-    font-size: 24px; /* nhỏ hơn một chút */
-    font-weight: 700;
-    color: var(--color-foodie-primary);
-    padding: 10px 0 25px 0;
-    text-align: center;
-    transition: opacity 0.1s;
-}
-
-/* Ẩn các nút toggle không cần thiết nữa */
+/* Nút toggle luôn hiển thị */
 .btn-toggle-sidebar {
-    display: none !important;
-}
-
-/* ------------------- Tùy chỉnh nhỏ cho hiệu ứng thẩm mỹ ------------------- */
-
-/* Tắt hiệu ứng 'toggled' cũ (nếu có) */
-.dashboard-wrapper.toggled .sidebar {
-    transform: translateX(0) !important;
-}
-
-.nav-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-    .nav-list a {
-        display: flex;
-        align-items: center;
-        padding: 10px 12px; /* nhỏ gọn hơn */
-        text-decoration: none;
-        color: var(--color-text-dark);
-        margin-bottom: 5px;
-        border-radius: 5px;
-        transition: background-color 0.2s, color 0.2s;
-        white-space: nowrap; /* đảm bảo 1 hàng */
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-        .nav-list a:hover {
-            background-color: var(--color-foodie-secondary);
-            color: var(--color-foodie-primary);
-        }
-
-        .nav-list a.active {
-            background-color: var(--color-foodie-primary);
-            color: var(--color-white);
-        }
-
-        /* Placeholder Icons (Cần thay thế bằng SVG/Font Icon thực tế) */
-        .nav-list a i {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            background-color: currentColor; /* Dùng màu chữ làm màu icon */
-            mask-size: cover;
-            -webkit-mask-size: cover;
-            /* Giả lập các Icon khác nhau bằng màu */
-            mask: url('/icons/placeholder.svg'); /* Đổi URL này */
-            -webkit-mask: url('/icons/placeholder.svg'); /* Đổi URL này */
-        }
-/* Vì không có Font Awesome, tôi để placeholder, nếu có icon bạn chỉ cần thay thế <i> bằng code icon đó */
-
-
-.admin-profile {
-    display: flex;
-    align-items: center;
-    padding: 15px 0;
-    margin-top: 20px;
-    border-top: 1px solid #eee;
-}
-
-    .admin-profile img {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        margin-right: 8px;
-    }
-
-.admin-name {
-    font-weight: 600;
-    font-size: 0.85rem;
-}
-
-/* ------------------- Main Content ------------------- */
-.main-content {
-    flex-grow: 1;
-    padding: 20px 30px;
-}
-
-.top-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-}
-
-.page-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--color-text-dark);
-}
-
-.btn-toggle-sidebar {
-    display: none; /* Ẩn trên desktop */
+    display: block !important;
     background: none;
     border: none;
     font-size: 24px;
     cursor: pointer;
-    color: var(--color-foodie-primary);
+    color: red !important;
+    margin: 10px; /* điều chỉnh vị trí */
 }
 
-/* ------------------- Dashboard Grid (Bố cục) ------------------- */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+/* Nội dung chính di chuyển theo sidebar nếu muốn */
+.main-content {
+    flex-grow: 1;
+    padding: 20px 30px;
+    margin-left: 40px; /* phần sidebar còn lại khi ẩn */
+    transition: margin-left 0.3s ease-in-out;
 }
 
-/* Stat Cards */
-.stat-card {
-    background-color: var(--color-white);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border-left: 5px solid var(--color-foodie-primary); /* Điểm nhấn Foodie */
+/* Khi sidebar hiện ra, đẩy nội dung sang phải */
+.sidebar.collapsed ~ .main-content {
+    margin-left: 220px;
 }
 
-.stat-title {
-    font-size: 14px;
-    color: var(--color-text-muted);
-    margin-bottom: 5px;
-}
-
-.stat-value {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0 0 5px 0;
-}
-
-.stat-change {
-    font-size: 13px;
-}
-
-/* Boxes (Chart & List) */
-.chart-box, .list-box {
-    background-color: var(--color-white);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
-
-.box-header {
-    font-size: 18px;
-    font-weight: 600;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-.chart-revenue {
-    grid-column: span 3; /* Chiếm 3 cột */
-}
-
-.top-selling-box {
-    grid-column: span 1; /* Chiếm 1 cột */
-}
-
-.recent-orders-box {
-    grid-column: 1 / -1; /* Chiếm toàn bộ chiều rộng (4 cột) */
-}
-
-/* List Items */
-.list-box ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-    .list-box ul li {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 0;
-        border-bottom: 1px dashed #eee;
-    }
-
-        .list-box ul li:last-child {
-            border-bottom: none;
-        }
-
-.item-name {
-    font-weight: 500;
-}
-
-.item-count {
-    padding: 4px 10px;
-    border-radius: 15px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-/* Table */
-.table-container {
-    overflow-x: auto;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-    .data-table th, .data-table td {
-        padding: 12px 15px;
-        text-align: left;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .data-table th {
-        font-weight: 500;
-        color: var(--color-text-muted);
-        text-transform: uppercase;
-        font-size: 12px;
-    }
-
-/* Trạng thái (Status Badge) */
-.status {
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--color-white);
-}
-
-    .status.completed {
-        background-color: #4CAF50;
-    }
-
-    .status.processing {
-        background-color: var(--color-foodie-primary);
-    }
-
-    .status.cancelled {
-        background-color: #F44336;
-    }
-
-/* ------------------- Responsive ------------------- */
-@media (max-width: 1200px) {
-    .dashboard-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .chart-revenue {
-        grid-column: span 2;
-    }
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        position: fixed;
-        left: 0;
-        transform: translateX(-100%);
-        z-index: 1000;
-    }
-
-    .dashboard-wrapper.toggled .sidebar {
-        transform: translateX(0);
-    }
-
-    .main-content {
-        padding: 15px;
-    }
-
-    .btn-toggle-sidebar {
-        display: block;
-    }
-
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .chart-revenue, .top-selling-box {
-        grid-column: span 1;
-    }
-}

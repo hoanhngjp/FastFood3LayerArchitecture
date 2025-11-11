@@ -1,0 +1,150 @@
+﻿/* --- Cấu trúc Header Combo --- */
+.combo-detail-section {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.combo-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 15px; /* Giữ padding để nội dung không dính vào lề */
+}
+
+.combo-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.combo-tag {
+    color: var(--orange);
+    font-weight: bold;
+}
+
+.combo-title {
+    font-size: 40px;
+    margin-top: 10px;
+}
+
+.combo-saving-text {
+    font-size: 20px;
+    color: #4CAF50;
+    font-weight: 500;
+}
+
+/* --- Layout chính Combo (Áp dụng kiểu 2 cột) --- */
+
+.combo-body-wrapper {
+    /* Áp dụng cấu trúc Flexbox 2 cột chính */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px; /* Khoảng cách giữa 2 cột */
+    align-items: flex-start;
+}
+
+/* Cột 1: Hình ảnh Combo (Tái sử dụng product-image-area) */
+.combo-main-image {
+    flex: 1 1 45%; /* Chiếm 45% chiều rộng */
+    position: relative;
+    border: 1px solid #eee;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    background-color: #fff; /* Đảm bảo nền trắng */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    /* Các thuộc tính trong combo-detail.css sẽ ghi đè lên product-detail.css nếu cần */
+}
+
+    .combo-main-image img {
+        max-width: 100%;
+        height: auto;
+    }
+
+/* Cột 2: Danh sách Thành phần (Sử dụng kiểu product-info-area) */
+.combo-items-list {
+    flex: 1 1 45%; /* Chiếm 45% chiều rộng */
+    /* Đây là nơi đặt danh sách thành phần, giá, và nút hành động */
+}
+
+/* --- Danh sách thành phần chi tiết --- */
+.items-list-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.combo-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee; /* Đường kẻ phân chia với khối giá */
+    padding-bottom: 20px;
+}
+
+.combo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px dashed #f5f5f5;
+    font-size: 17px;
+}
+
+    .combo-item:last-child {
+        border-bottom: none;
+    }
+
+.combo-check {
+    color: #4CAF50;
+    font-size: 20px;
+}
+
+.combo-item-qty {
+    font-weight: bold;
+    color: var(--orange);
+    min-width: 30px;
+}
+
+.combo-item-name {
+    flex-grow: 1;
+}
+
+.combo-item-price {
+    font-style: italic;
+    color: #888;
+}
+
+/* --- Tóm tắt giá --- */
+.combo-price-summary {
+    /* Đảm bảo khối này nằm gọn trong combo-items-list */
+    display: block;
+    margin-bottom: 30px;
+}
+
+    .combo-price-summary .price-text {
+        margin-bottom: 5px;
+        font-size: 16px;
+    }
+
+    .combo-price-summary .price-old {
+        color: #999;
+    }
+
+    .combo-price-summary .price-current {
+        font-size: 40px;
+        color: #cc3333;
+    }
+
+/* --- Hành động (Số lượng và nút) --- */
+/* Tái sử dụng .cart-action-group, .quantity-control, v.v. từ product-detail.css */
+
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .combo-body-wrapper {
+        flex-direction: column; /* Đẩy các cột xuống dòng trên di động */
+    }
+
+    .combo-main-image, .combo-items-list {
+        flex: 1 1 100%; /* Chiếm toàn bộ chiều rộng */
+    }
+}
