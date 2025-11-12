@@ -1,1 +1,39 @@
-﻿
+﻿body {
+    /* Thêm màu nền cho body để giống ảnh (nếu muốn) */
+    background-color: #f8f9fa;
+}
+
+/* CSS cho thẻ thống kê màu tím */
+.stat-card {
+    border: none;
+    border-radius: 0.75rem; /* Bo góc nhiều hơn */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease-in-out;
+}
+
+    .stat-card:hover {
+        transform: translateY(-5px); /* Hiệu ứng khi di chuột */
+    }
+
+/* CSS cho Món ăn phổ biến (chữ viết tắt) */
+.popular-item-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 45px;
+    height: 45px;
+    border-radius: 0.5rem; /* Bo góc vuông */
+    font-weight: bold;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+/* Tinh chỉnh card-header và list-group cho sạch sẽ hơn */
+.card-header.bg-white {
+    border-bottom: 1px solid #eee;
+}
+
+.list-group-item {
+    border-color: #eee; /* Làm mờ đường viền */
+}

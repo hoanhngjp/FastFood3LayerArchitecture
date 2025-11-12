@@ -1,270 +1,32 @@
-﻿/* --- Cài đặt chung --- */
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-    line-height: 1.6;
-    margin: 0;
-    padding: 20px;
+﻿/* --- CSS Tùy chỉnh (dùng Bootstrap 5) --- */
+
+/* Đảm bảo thanh tóm tắt giỏ hàng luôn hiển thị khi cuộn */
+.checkout-summary-card {
+    /* Điều chỉnh top để nó không bị dính vào header nếu có */
+    top: 20px;
 }
 
-/* --- Khung chứa chính --- */
-.checkout-container {
-    max-width: 1200px;
-    margin: 20px auto;
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+/* Tinh chỉnh form input: Mặc dù Bootstrap đã tốt, có thể thêm hiệu ứng focus */
+.form-control:focus {
+    border-color: #ffc107; /* Màu vàng cam */
+    box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
 }
 
-/* --- Tiêu đề --- */
-.checkout-header {
-    text-align: center;
-    padding: 20px 30px;
-    border-bottom: 1px solid #eee;
+/* Tùy chỉnh cho danh sách sản phẩm */
+.list-group-item {
+    border-color: #e9ecef; /* Viền nhẹ hơn */
 }
 
-    .checkout-header h2 {
-        margin: 0 0 10px 0;
-        font-size: 28px;
-        font-weight: 600;
-    }
-
-    .checkout-header p {
-        margin: 0;
-        color: #777;
-        font-size: 15px;
-    }
-
-/* --- Thân trang (2 cột) --- */
-.checkout-body {
-    display: flex;
-    flex-wrap: wrap; /* Cho phép xuống hàng trên di động */
-    padding: 30px;
-    gap: 30px; /* Khoảng cách giữa 2 cột */
+/* Tùy chỉnh nút "Hoàn tất Đặt hàng" */
+.btn-warning {
+    /* Đảm bảo chữ trên nút màu đen nếu dùng tông cam */
+    color: #212529 !important;
 }
 
-/* --- Cột bên trái: Thông tin khách hàng --- */
-.customer-info {
-    flex: 2; /* Chiếm 2/3 không gian */
-    min-width: 300px; /* Độ rộng tối thiểu */
-}
-
-    .customer-info h3,
-    .cart-summary h3 {
-        font-size: 20px;
-        font-weight: 600;
-        margin-top: 0;
-        margin-bottom: 20px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 10px;
-    }
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-    .form-group label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 500;
-        color: #555;
-    }
-
-    .form-group input[type="text"],
-    .form-group input[type="tel"],
-    .form-group input[type="email"] {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background-color: #f9f9f9;
-        box-sizing: border-box; /* Đảm bảo padding không làm vỡ layout */
-        font-size: 15px;
-    }
-
-/* --- Hình thức thanh toán --- */
-.payment-option {
-    margin-bottom: 12px;
-}
-
-    .payment-option input[type="radio"] {
-        margin-right: 8px;
-        transform: translateY(2px);
-    }
-
-    .payment-option label {
-        font-size: 16px;
-        cursor: pointer;
-    }
-
-.btn-order {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    text-align: center;
-    margin-top: 30px;
-    transition: background-color 0.3s ease;
-}
-
-    .btn-order:hover {
-        background-color: orange;
-    }
-
-/* --- Cột bên phải: Giỏ hàng --- */
-.cart-summary {
-    flex: 1; /* Chiếm 1/3 không gian */
-    min-width: 300px; /* Độ rộng tối thiểu */
-    background-color: #fdfdfd;
-    border: 1px solid #eee;
-    padding: 25px;
-    border-radius: 5px;
-}
-
-    .cart-summary h3 {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-.cart-badge {
-    background-color: #6c757d;
-    color: white;
-    font-size: 13px;
-    font-weight: bold;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Danh sách sản phẩm */
-.cart-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 20px 0;
-}
-
-.cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 15px 0;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-    .cart-item:last-child {
-        border-bottom: none;
-    }
-
-.item-details {
-    display: flex;
-    flex-direction: column;
-}
-
-.item-name {
-    font-weight: bold;
-    color: #333;
-}
-
-.item-qty {
-    font-size: 14px;
-    color: #888;
-    margin-top: 2px;
-}
-
-.item-price {
-    font-weight: bold;
-    font-size: 16px;
-    color: #000;
-}
-
-/* Tổng thanh toán */
-.total-summary {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 20px;
-    border-top: 2px solid #ddd;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-    .total-summary strong {
-        font-size: 22px;
-        color: #d9534f; /* Màu đỏ cho tổng tiền */
-    }
-
-/* Mã khuyến mãi */
-.promo-form {
-    margin-top: 25px;
-}
-
-    .promo-form label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 500;
-    }
-
-.promo-input {
-    display: flex;
-}
-
-    .promo-input input[type="text"] {
-        flex-grow: 1;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-right: none;
-        border-radius: 4px 0 0 4px;
-        font-size: 15px;
-    }
-
-.btn-promo {
-    padding: 0 20px;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 0 4px 4px 0;
-    cursor: pointer;
-    font-size: 15px;
-    white-space: nowrap; /* Ngăn chữ "Xác nhận" xuống hàng */
-}
-
-    .btn-promo:hover {
-        background-color: #5a6268;
-    }
-
-/* --- Footer --- */
-.checkout-footer {
-    text-align: center;
-    padding: 20px 30px;
-    border-top: 1px solid #eee;
-    color: #888;
-    font-size: 14px;
-}
-
-
-/* --- Responsive cho di động --- */
-@media (max-width: 768px) {
-    .checkout-body {
-        flex-direction: column; /* Xếp 2 cột chồng lên nhau */
-    }
-
-    .checkout-container {
-        padding: 0;
-    }
-
-    .checkout-body {
-        padding: 20px;
+/* Responsive: Trên màn hình nhỏ, thẻ tổng kết không dính */
+@media (max-width: 991.98px) {
+    .checkout-summary-card {
+        /* Bỏ sticky trên di động */
+        position: static !important;
     }
 }
-

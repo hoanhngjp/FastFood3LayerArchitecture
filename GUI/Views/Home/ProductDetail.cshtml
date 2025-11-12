@@ -1,73 +1,141 @@
-﻿
-@{
+﻿@{
     Layout = "_Layout";
+    ViewData["Title"] = "Chi tiết sản phẩm | Fried Chicken Unlimited";
 }
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết sản phẩm | Fried Chicken Unlimited</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/product-detail.css">
-    <link rel="stylesheet" href="/css/cart.css">
-</head>
-<body>
 
-    <section class="section product-detail-section">
-        <div class="container product-detail-container">
+<style>
+    /* Màu cam đậm cho tiêu đề chính */
+    .text-dark-orange {
+        color: #FF8800 !important;
+    }
+    /* Ghi đè màu đỏ cho icon rating để dùng màu cam/vàng */
+    .rating-wrapper i.bi-star-fill {
+        color: #FFC107; /* Màu vàng cam của Bootstrap Warning */
+    }
+    /* Giá cũ dùng màu xám */
+    .price-old {
+        color: #6c757d; /* Màu xám */
+    }
+    /* Các nút và badge sẽ dùng màu warning/cam */
+    .badge-discount {
+        background-color: #FF8800 !important;
+        color: white;
+    }
 
+    /* === ĐIỀU CHỈNH KÍCH THƯỚC VÀ KHUNG ẢNH === */
+    .product-image-area {
+        position: relative;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+        /* Giảm giới hạn kích thước tối đa (Ảnh nhỏ hơn) */
+        max-width: 350px;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        margin: 0 auto; /* Căn giữa khung ảnh trong cột */
+    }
+
+    .product-main-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .badge-discount {
+        position: absolute;
+        top: 0;
+        right: 0;
+        transform: translate(25%, -25%);
+        font-size: 0.9rem;
+        padding: 0.5em 0.8em;
+        z-index: 10;
+    }
+
+    /* Ẩn các nút mũi tên cho input number (như yêu cầu trước) */
+    .qty-input::-webkit-outer-spin-button,
+    .qty-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .qty-input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+</style>
+
+<div class="container my-5">
+
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="text-dark-orange fw-bolder"><i class="bi bi-basket-fill me-2"></i> Chi tiết món ăn</h1>
+        </div>
+    </div>
+
+    <div class="row g-5 product-detail-container">
+
+        <div class="col-lg-5">
             <div class="product-image-area">
                 <img src="/images/food-menu-1.png" alt="Fried Chicken Unlimited" class="product-main-image">
-                <div class="badge product-badge">-15%</div>
+
+                <span class="badge badge-discount">
+                    -15%
+                </span>
+            </div>
+        </div>
+
+        <div class="col-lg-7 product-info-area">
+
+            <p class="text-muted text-uppercase fw-bold mb-1">Chicken</p>
+            <h1 class="h2 section-title product-title fw-bold text-dark-orange">Fried Chicken Unlimited</h1>
+
+            <div class="rating-wrapper detail-rating mb-3 fs-5">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-half"></i>
+                <span class="text-muted ms-2 fs-6">(150 Đánh giá)</span>
             </div>
 
-            <div class="product-info-area">
-                <p class="section-subtitle product-category">Chicken</p>
-                <h1 class="h1 section-title product-title">Fried Chicken Unlimited</h1>
-
-                <div class="rating-wrapper detail-rating">
-                    <ion-icon name="star"></ion-icon>
-                    <ion-icon name="star"></ion-icon>
-                    <ion-icon name="star"></ion-icon>
-                    <ion-icon name="star"></ion-icon>
-                    <ion-icon name="star"></ion-icon>
-                    <span class="rating-count">(150 Reviews)</span>
-                </div>
-
-                <div class="price-wrapper detail-price">
-                    <data class="price-current" value="49.00">$49.00</data>
-                    <del class="price-old">$69.00</del>
-                    <p class="price-text">Tiết kiệm: $20.00</p>
-                </div>
-
-                <p class="product-description">
-                    Gà rán giòn rụm với công thức ướp đặc biệt, chiên ngập dầu cho lớp vỏ ngoài vàng óng. Phù hợp cho bữa ăn gia đình hoặc tiệc tùng.
-                </p>
-
-                <p class="availability">Tình trạng: <strong>Còn hàng</strong></p>
-
-                <div class="cart-action-group">
-                    <div class="quantity-control">
-                        <button class="qty-btn">-</button>
-                        <input type="text" value="1" min="1" class="qty-input">
-                        <button class="qty-btn">+</button>
-                    </div>
-
-                    <button class="btn add-to-cart-btn">
-                        Thêm vào giỏ hàng
-                    </button>
-
-                </div>
-
-                <a href="/#food-menu" class="btn btn-continue">
-                    Tiếp tục chọn món
-                </a>
-             
+            <div class="price-wrapper detail-price mb-4">
+                <data class="price-current fw-bolder text-danger fs-1" value="49.00">$49.00</data>
+                <del class="price-old text-muted ms-3 fs-4">$69.00</del>
+                <p class="price-text mt-2 text-dark-orange fw-bold">Tiết kiệm ngay: $20.00</p>
             </div>
+
+            <p class="product-description text-secondary mb-4">
+                Gà rán giòn rụm với công thức ướp đặc biệt, chiên ngập dầu cho lớp vỏ ngoài vàng óng. Phù hợp cho bữa ăn gia đình hoặc tiệc tùng.
+            </p>
+
+            <p class="availability fs-5">Tình trạng: <strong class="text-success">Còn hàng</strong></p>
+
+            <hr>
+
+            <div class="cart-action-group d-flex align-items-center gap-3">
+                <div class="quantity-control input-group" style="width: 150px;">
+                    <button class="btn btn-outline-warning qty-btn" type="button" id="button-addon1">-</button>
+                    <input type="number" value="1" min="1" class="form-control text-center qty-input" aria-label="Số lượng">
+                    <button class="btn btn-outline-warning qty-btn" type="button" id="button-addon2">+</button>
+                </div>
+
+                <button class="btn btn-warning btn-lg add-to-cart-btn text-dark fw-bold flex-grow-1" style="max-width: 300px;">
+                    <i class="bi bi-cart-plus me-2"></i> Thêm vào giỏ hàng
+                </button>
+            </div>
+
+            <hr>
+
+            <a href="/#food-menu" class="btn btn-outline-secondary btn-sm mt-3">
+                <i class="bi bi-arrow-left me-2"></i> Tiếp tục chọn món
+            </a>
 
         </div>
-    </section>
 
-</body>
-</html>
+    </div>
+
+</div>
