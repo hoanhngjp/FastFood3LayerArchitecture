@@ -1,58 +1,87 @@
-﻿<!DOCTYPE html>
+﻿@{
+    // Biến này được dùng để mô phỏng trạng thái đăng nhập khi Debug/Thiết kế
+    bool isAuthenticatedMock = true; // Đặt thành true để hiển thị menu Đã đăng nhập
+    string mockUsername = "Hoành Nghiệp";
+    string mockEmail = "hoanhngjpn@foodie.com";
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - GUI</title>
 
-    <!-- 🟦 Bootstrap CSS (thêm mới) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-    <!-- 🟩 CSS cũ của bạn (đặt sau để ghi đè nếu cần) -->
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/css/ionicons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
+        /* Tùy chỉnh Logo */
+        .logo {
+            color: #FF8800; /* Tông màu cam/vàng chủ đạo */
+        }
         /* Ẩn mũi tên caret */
         .dropdown-toggle::after {
             display: none;
+        }
+        /* CSS cho Nav links (làm cho chúng nổi bật hơn) */
+        .navbar-nav .nav-link:hover {
+            color: #FFC107 !important; /* Màu vàng cam khi hover */
         }
     </style>
 </head>
 
 <body>
-    <header class="header" data-header>
+    <header class="header bg-white shadow-sm py-3" data-header>
         <div class="container d-flex justify-content-between align-items-center">
-            <h1><a href="@Url.Action("Index", "Home")" class="logo text-decoration-none">Foodie</a></h1>
 
-            <nav class="navbar" data-navbar>
-                <ul class="navbar-list list-unstyled d-flex mb-0">
-                    <li><a href="/#home" class="navbar-link px-3" data-nav-link>Home</a></li>
-                    <li><a href="/#about" class="navbar-link px-3" data-nav-link>About</a></li>
-                    <li><a href="/#food-menu" class="navbar-link px-3" data-nav-link>Shop</a></li>
-                    <li><a href="/#contact" class="navbar-link px-3" data-nav-link>Contact</a></li>
+            <h1><a href="@Url.Action("Index", "Home")" class="logo text-decoration-none fw-bold fs-4">Foodie<span style="color: #E67E22;">.</span></a></h1>
+
+            <nav class="navbar navbar-expand-lg" data-navbar>
+                <ul class="navbar-nav list-unstyled d-flex mb-0">
+                    <li class="nav-item"><a href="/#home" class="nav-link px-3" data-nav-link>Home</a></li>
+                    <li class="nav-item"><a href="/#about" class="nav-link px-3" data-nav-link>About</a></li>
+                    <li class="nav-item"><a href="/#food-menu" class="nav-link px-3" data-nav-link>Shop</a></li>
+                    <li class="nav-item"><a href="/#contact" class="nav-link px-3" data-nav-link>Contact</a></li>
                 </ul>
             </nav>
 
-            <div class="header-btn-group d-flex align-items-center gap-2 position-relative">
+            <div class="header-btn-group d-flex align-items-center gap-2">
 
-                <button class="btn btn-outline-primary" onclick="location.href='@Url.Action("Login", "Home")'">Login</button>
-                <button class="btn btn-primary" onclick="location.href='@Url.Action("Registry", "Home")'">Registry</button>
+                @if (isAuthenticatedMock) // SỬ DỤNG MÔ PHỎNG ĐĂNG NHẬP
+                {
+                    // ⭐️ TRẠNG THÁI ĐÃ ĐĂNG NHẬP
+                    <div class="dropdown">
+                        <button class="btn btn-outline-warning dropdown-toggle" type="button" id="userMenuToggle" data-bs-toggle="dropdown" aria-expanded="true" title="Menu người dùng">
+                            <i class="bi bi-person-circle fs-5"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userMenuToggle">
+                            <li><strong class="dropdown-item-text"><i class="bi bi-person me-2"></i> @mockUsername</strong></li>
+                            <li><small class="dropdown-item-text text-muted ps-3">@mockEmail</small></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/Account/Index"><i class="bi bi-gear me-2"></i> Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="/Home/Logout"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    // ⭐️ TRẠNG THÁI CHƯA ĐĂNG NHẬP
+                    <button class="btn btn-outline-warning" onclick="location.href='@Url.Action("Login", "Home")'">Login</button>
+                    <button class="btn btn-warning" onclick="location.href='@Url.Action("Registry", "Home")'">Registry</button>
+                }
+                <a class="btn btn-warning position-relative"
+                   href="@Url.Action("Cart", "Home")"
+                   title="Giỏ hàng (3)">
 
-                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userMenuToggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    ☰
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuToggle">
-                    <li><strong class="dropdown-item-text">John Doe</strong></li>
-                    <li><small class="dropdown-item-text text-muted">john@example.com</small></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="/Account/Index">Dashboard</a></li>
-                    <li><a class="dropdown-item" href="/Account/Profile">Profile</a></li>
-                    <li><a class="dropdown-item" href="/Account/OrderHistory">Order History</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="/Home/Logout">Logout</a></li>
-                </ul>
+                    <i class="bi bi-bag-fill"></i>
 
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        3
+                        <span class="visually-hidden">sản phẩm trong giỏ hàng</span>
+                    </span>
+                </a>
             </div>
 
         </div>
@@ -64,47 +93,46 @@
         </main>
     </div>
 
-    <footer id="contact" class="footer mt-5">
+    <footer id="contact" class="footer mt-5 bg-dark text-white">
         <div class="footer-top py-5" style="background-image: url('/images/footer-illustration.png')">
             <div class="container d-flex flex-wrap justify-content-between gap-4">
 
                 <div class="footer-brand col-md-4">
-                    <a href="" class="logo text-decoration-none fs-3 fw-bold">Foodie<span class="span">.</span></a>
-                    <p class="footer-text mt-3">
+                    <a href="" class="logo text-decoration-none fs-3 fw-bold text-white">Foodie<span style="color: #E67E22;">.</span></a>
+                    <p class="footer-text mt-3 text-white-50">
                         Financial experts support or help you to find out which way you can raise your funds more.
                     </p>
                     <ul class="social-list list-unstyled d-flex gap-3 mt-3">
-                        <li><a href="#" class="social-link"><ion-icon name="logo-facebook"></ion-icon></a></li>
-                        <li><a href="#" class="social-link"><ion-icon name="logo-twitter"></ion-icon></a></li>
-                        <li><a href="#" class="social-link"><ion-icon name="logo-instagram"></ion-icon></a></li>
-                        <li><a href="#" class="social-link"><ion-icon name="logo-pinterest"></ion-icon></a></li>
+                        <li><a href="#" class="social-link text-white-50 fs-4"><i class="bi bi-facebook"></i></a></li>
+                        <li><a href="#" class="social-link text-white-50 fs-4"><i class="bi bi-twitter"></i></a></li>
+                        <li><a href="#" class="social-link text-white-50 fs-4"><i class="bi bi-instagram"></i></a></li>
+                        <li><a href="#" class="social-link text-white-50 fs-4"><i class="bi bi-pinterest"></i></a></li>
                     </ul>
                 </div>
 
                 <ul class="footer-list list-unstyled col-md-3">
                     <li><p class="footer-list-title fw-bold">Contact Info</p></li>
-                    <li><p class="footer-list-item">+91 9664128814</p></li>
-                    <li><p class="footer-list-item">Info@Naveen24.com</p></li>
-                    <li><address class="footer-list-item">147 Williamson P, Tamilnadu, Chennai</address></li>
+                    <li><p class="footer-list-item text-white-50">+91 9664128814</p></li>
+                    <li><p class="footer-list-item text-white-50">Info@Naveen24.com</p></li>
+                    <li><address class="footer-list-item text-white-50">147 Williamson P, Tamilnadu, Chennai</address></li>
                 </ul>
 
                 <ul class="footer-list list-unstyled col-md-3">
                     <li><p class="footer-list-title fw-bold">Opening Hours</p></li>
-                    <li><p class="footer-list-item">Monday-Friday: 08:00-22:00</p></li>
-                    <li><p class="footer-list-item">Tuesday 4PM: Till Mid Night</p></li>
-                    <li><p class="footer-list-item">Saturday: 10:00-16:00</p></li>
+                    <li><p class="footer-list-item text-white-50">Monday-Friday: 08:00-22:00</p></li>
+                    <li><p class="footer-list-item text-white-50">Tuesday 4PM: Till Mid Night</p></li>
+                    <li><p class="footer-list-item text-white-50">Saturday: 10:00-16:00</p></li>
                 </ul>
 
             </div>
         </div>
+        <div class="text-center py-3 bg-dark border-top border-secondary">
+            <p class="mb-0 text-white-50 small">&copy; @DateTime.Now.Year Foodie. All rights reserved.</p>
+        </div>
     </footer>
 
-    <!-- 🟨 Bootstrap JS Bundle (thêm mới) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- 🧩 Thư viện & script cũ -->
-    <script src="/lib/jquery/dist/jquery.min.js"></script>
-    <script src="/js/script.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

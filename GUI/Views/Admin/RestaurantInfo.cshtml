@@ -1,0 +1,48 @@
+﻿@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Thông tin Nhà hàng";
+}
+
+<h2 class="mb-4">⚙️ Thiết lập Thông tin Nhà hàng</h2>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0">Cập nhật Chi tiết Foodie</h5>
+    </div>
+    <div class="card-body">
+        <form>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="restaurantName" class="form-label">Tên Nhà hàng</label>
+                    <input type="text" class="form-control" id="restaurantName" value="Foodie" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="restaurantPhone" class="form-label">Số điện thoại</label>
+                    <input type="tel" class="form-control" id="restaurantPhone" value="090-xxx-xxxx" required>
+                </div>
+                <div class="col-12">
+                    <label for="restaurantAddress" class="form-label">Địa chỉ</label>
+                    <input type="text" class="form-control" id="restaurantAddress" value="123 Đường ABC, Quận XYZ, TP.HCM">
+                </div>
+                <div class="col-md-6">
+                    <label for="hoursWeekday" class="form-label">Giờ mở cửa (Thứ 2 - Thứ 6)</label>
+                    <input type="text" class="form-control" id="hoursWeekday" value="09:00 AM - 10:00 PM">
+                </div>
+                <div class="col-md-6">
+                    <label for="hoursWeekend" class="form-label">Giờ mở cửa (Thứ 7 - Chủ Nhật)</label>
+                    <input type="text" class="form-control" id="hoursWeekend" value="08:00 AM - 11:00 PM">
+                </div>
+
+                <div class="col-12">
+                    <label for="restaurantLogo" class="form-label">Logo Nhà hàng</label>
+                    <input class="form-control" type="file" id="restaurantLogo">
+                </div>
+
+                <div class="col-12 mt-4">
+                    <button type="submit" class="btn btn-warning text-dark"><i class="bi bi-save me-2"></i> Lưu thay đổi</button>
+                    <button type="button" class="btn btn-outline-secondary ms-2">Hủy</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

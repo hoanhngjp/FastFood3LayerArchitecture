@@ -1,39 +1,47 @@
 ﻿@{
     Layout = "_AdminLayout";
-    ViewData["Title"] = "Quản lý Đơn hàng";
+    ViewData["Title"] = "Orders";
 }
 
-<h2 class="mb-4">🧾 Danh sách Đơn hàng</h2>
+<h2 class="mb-4">📋 Quản lý Đơn hàng</h2>
 
-<div class="table-responsive">
-    <table class="table table-bordered table-hover align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>Mã đơn</th>
-                <th>Khách hàng</th>
-                <th>Ngày đặt</th>
-                <th>Tổng tiền</th>
-                <th>Trạng thái</th>
-                <th>Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>#DH001</td>
-                <td>Nguyễn Văn A</td>
-                <td>2025-11-11</td>
-                <td>₫350,000</td>
-                <td><span class="badge bg-success">Hoàn tất</span></td>
-                <td><button class="btn btn-sm btn-outline-primary">Chi tiết</button></td>
-            </tr>
-            <tr>
-                <td>#DH002</td>
-                <td>Trần Thị B</td>
-                <td>2025-11-10</td>
-                <td>₫150,000</td>
-                <td><span class="badge bg-warning text-dark">Đang xử lý</span></td>
-                <td><button class="btn btn-sm btn-outline-primary">Chi tiết</button></td>
-            </tr>
-        </tbody>
-    </table>
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0">Danh sách Đơn hàng (1248 đơn)</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">Đây là nơi hiển thị bảng chi tiết các đơn hàng, bao gồm trạng thái, tổng tiền và thông tin khách hàng.</p>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Mã Đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Ngày đặt</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#ORD1001</td>
+                        <td>Nguyễn A</td>
+                        <td>20/11/2025</td>
+                        <td>250.000₫</td>
+                        <td><span class="badge bg-success">Đã hoàn thành</span></td>
+                        <td><a href="#" class="btn btn-sm btn-outline-secondary">Xem chi tiết</a></td>
+                    </tr>
+                    <tr>
+                        <td>#ORD1002</td>
+                        <td>Trần B</td>
+                        <td>20/11/2025</td>
+                        <td>150.000₫</td>
+                        <td><span class="badge bg-info">Đang giao</span></td>
+                        <td><a href="#" class="btn btn-sm btn-outline-secondary">Xem chi tiết</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

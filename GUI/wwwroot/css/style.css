@@ -2474,71 +2474,7 @@ textarea.input-field {
             font-size: 0.95rem;
         }
 
-        /* ===== Footer link ===== */
-        .page-reservation .reservation-footer-text {
-            text-align: center;
-            margin-top: 1.5rem;
-            font-size: 0.95rem;
-            color: #555;
-            text-decoration: none;
-            position: relative;
-        }
-
-            .page-reservation .reservation-footer-text a {
-                font-weight: 600;
-                color: var(--primary-color);
-                text-decoration: none;
-                transition: 0.3s;
-                position: relative;
-            }
-
-                .page-reservation .reservation-footer-text a:hover {
-                    color: #ff5722;
-                    text-decoration: underline;
-                }
-
-    /* ===== Responsive ===== */
-    @media (max-width: 768px) {
-        .page-reservation .reservation-wrapper {
-            padding: 30px 15px;
-            margin-top: 100px;
-        }
-
-        .page-reservation .reservation-card {
-            padding: 30px;
-        }
-
-            .page-reservation .reservation-card h2 {
-                font-size: 1.6rem;
-            }
-    }
-
-    @media (max-width: 480px) {
-        .page-reservation .reservation-wrapper {
-            padding: 20px 10px;
-            margin-top: 80px;
-        }
-
-        .page-reservation .reservation-card {
-            padding: 20px;
-        }
-
-            .page-reservation .reservation-card h2 {
-                font-size: 1.4rem;
-            }
-
-        .page-reservation input,
-        .page-reservation select,
-        .page-reservation textarea,
-        .page-reservation button {
-            font-size: 0.95rem;
-        }
-
-        .page-reservation .reservation-footer-text {
-            font-size: 0.85rem;
-        }
-    }
-}
+    
 
 
 
