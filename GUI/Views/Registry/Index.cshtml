@@ -19,25 +19,16 @@
         <h2 class="section-title">Đăng ký tài khoản</h2>
 
         <form class="form-container" id="registerForm">
-            <!-- Full Name -->
-            <input type="text" name="fullName" class="input-field" placeholder="Họ và tên" required>
+            <div id="alert-message-signup" style="display: none; color: red; margin-bottom: 10px;"></div>
+            <input type="text" name="fullName" id="fullName"class="input-field" placeholder="Họ và tên" required>
+            <input type="email" name="email" id="email" class="input-field" placeholder="Email" required>
+            <input type="password" name="password" id="password" class="input-field" placeholder="Mật khẩu" required>
+            <input type="password" name="confirmPassword" id="confirmPassword" class="input-field" placeholder="Xác nhận mật khẩu" required>
+            <!--   <label for="dob" style="font-size:0.9rem; color:#555; margin-top:0.5rem;">Ngày sinh</label>
+            <input type="date" name="dob" id="dob" class="input-field" required>
 
-            <!-- Email -->
-            <input type="email" name="email" class="input-field" placeholder="Email" required>
-
-            <!-- Password -->
-            <input type="password" name="password" class="input-field" placeholder="Mật khẩu" required>
-
-            <!-- Confirm Password -->
-            <input type="password" name="confirmPassword" class="input-field" placeholder="Xác nhận mật khẩu" required>
-
-            <!-- Date of Birth -->
-            <label for="dob" style="font-size:0.9rem; color:#555; margin-top:0.5rem;">Ngày sinh</label>
-            <input type="date" name="dob" class="input-field" required>
-
-            <!-- Avatar -->
             <label for="avatar" style="font-size:0.9rem; color:#555; margin-top:0.5rem;">Ảnh đại diện (tùy chọn)</label>
-            <input type="url" name="avatar" class="input-field" placeholder="Link ảnh đại diện">
+            <input type="url" name="avatar" id="avatar" class="input-field" placeholder="Link ảnh đại diện">  -->
 
             <!-- Submit -->
             <button type="submit" class="btn">Đăng ký</button>
@@ -49,9 +40,7 @@
     </main>
 
 
-    <!-- Script load header & footer -->
-    <script src=/js/script.js"></script>
-    <script>
-    </script>
+    <script type="module" src="/js/authService.js"></script>
+    <script type="module" src="/js/signup.js"></script>
 </body>
 </html>

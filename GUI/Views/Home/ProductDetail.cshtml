@@ -76,13 +76,20 @@
         </div>
     </div>
 
-    <div class="row g-5 product-detail-container">
+    <div id="loading-message" class="text-center p-5" style="display: block;">
+        <p class="fs-4">Đang tải chi tiết món ăn...</p>
+        <div class="spinner-border text-dark-orange" role="status"></div>
+    </div>
+
+    <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+
+    <div class="row g-5 product-detail-container" id="product-detail-content" style="display: none;">
 
         <div class="col-lg-5">
             <div class="product-image-area">
-                <img src="/images/food-menu-1.png" alt="Fried Chicken Unlimited" class="product-main-image">
+                <img src="/images/food-menu-default.png" id="product-image" alt="Hình ảnh món ăn" class="product-main-image">
 
-                <span class="badge badge-discount">
+                <span class="badge badge-discount" id="discount-badge">
                     -15%
                 </span>
             </div>
@@ -90,25 +97,23 @@
 
         <div class="col-lg-7 product-info-area">
 
-            <p class="text-muted text-uppercase fw-bold mb-1">Chicken</p>
-            <h1 class="h2 section-title product-title fw-bold text-dark-orange">Fried Chicken Unlimited</h1>
+            <p class="text-muted text-uppercase fw-bold mb-1" id="product-category">Chicken</p>
 
-            <div class="rating-wrapper detail-rating mb-3 fs-5">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-half"></i>
-                <span class="text-muted ms-2 fs-6">(150 Đánh giá)</span>
+            <h1 class="h2 section-title product-title fw-bold text-dark-orange" id="product-title">Fried Chicken Unlimited</h1>
+
+            <div class="rating-wrapper detail-rating mb-3 fs-5" id="product-rating">
+                <span class="text-muted ms-2 fs-6" id="review-count">(150 Đánh giá)</span>
             </div>
 
             <div class="price-wrapper detail-price mb-4">
-                <data class="price-current fw-bolder text-danger fs-1" value="49.00">$49.00</data>
-                <del class="price-old text-muted ms-3 fs-4">$69.00</del>
-                <p class="price-text mt-2 text-dark-orange fw-bold">Tiết kiệm ngay: $20.00</p>
+                <data class="price-current fw-bolder text-danger fs-1" id="price-current" value="49.00">$49.00</data>
+
+                <del class="price-old text-muted ms-3 fs-4" id="price-old">$69.00</del>
+
+                <p class="price-text mt-2 text-dark-orange fw-bold" id="price-saved">Tiết kiệm ngay: $20.00</p>
             </div>
 
-            <p class="product-description text-secondary mb-4">
+            <p class="product-description text-secondary mb-4" id="product-description">
                 Gà rán giòn rụm với công thức ướp đặc biệt, chiên ngập dầu cho lớp vỏ ngoài vàng óng. Phù hợp cho bữa ăn gia đình hoặc tiệc tùng.
             </p>
 
@@ -139,3 +144,14 @@
     </div>
 
 </div>
+
+@* 🌟 KHỐI SCRIPT QUAN TRỌNG: LẤY ID VÀ LIÊN KẾT JS 🌟 *@
+<script>
+    // Lấy ID món ăn từ route data của Razor
+    // Đây là ID món ăn hiện tại để gọi API
+    window.foodId = @ViewContext.RouteData.Values["id"];
+</script>
+
+@* Đảm bảo foodService.js và productDetail.js được tải *@
+<script type="module" src="/js/foodService.js"></script>
+<script type="module" src="/js/productDetail.js"></script>

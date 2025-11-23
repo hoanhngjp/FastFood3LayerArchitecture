@@ -1,6 +1,7 @@
 ﻿@{
     Layout = "_Layout";
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +13,7 @@
     <!--
       - favicon
     -->
-    <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/svg+xml">
 
     <!--
       - custom css link
@@ -245,7 +246,7 @@
                                     Food is any substance consumed to provide nutritional support for an organism.
                                 </p>
 
-                                <img src="/images/promo-5.png" width="300" height="300" loading="lazy" alt="Chicken Masala"
+                                <img src="/images/premium-3.png" width="300" height="300" loading="lazy" alt="Chicken Masala"
                                      class="w-100 card-banner">
 
                             </div>
@@ -328,288 +329,57 @@
               - #FOOD MENU
             -->
 
-            <section class="section food-menu" id="food-menu">
-                <div class="container">
+        <section class="section food-menu" id="food-menu">
+            <div class="container">
 
-                    <p class="section-subtitle">Popular Dishes</p>
+                <p class="section-subtitle">Popular Dishes</p>
 
-                    <h2 class="h2 section-title">
-                        Our Delicious <span class="span">Foods</span>
-                    </h2>
+                <h2 class="h2 section-title">
+                    Our Delicious <span class="span">Foods</span>
+                </h2>
 
-                    <p class="section-text">
-                        Food is any substance consumed to provide nutritional support for an organism.
-                    </p>
+                <p class="section-text">
+                    Food is any substance consumed to provide nutritional support for an organism.
+                </p>
 
-                    <ul class="fiter-list">
+                <div class="category-filter-wrapper">
+                    <ul class="filter-list" id="category-list-container" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
 
                         <li>
-                            <button class="filter-btn  active">All</button>
+                            <button class="filter-btn active">All</button>
                         </li>
-
                         <li>
                             <button class="filter-btn">Pizza</button>
                         </li>
-
                         <li>
                             <button class="filter-btn">Burger</button>
                         </li>
-
                         <li>
                             <button class="filter-btn">Drinks</button>
                         </li>
-
                         <li>
                             <button class="filter-btn">Sandwich</button>
                         </li>
 
                     </ul>
-
-                    <ul class="food-menu-list">
-
-                        <li>
-                            <div class="food-menu-card">
-
-                                <div class="card-banner">
-                                    <img src="/images/food-menu-1.png" width="300" height="300" loading="lazy"
-                                         alt="Fried Chicken Unlimited" class="w-100">
-
-                                    <div class="badge">-15%</div>
-
-                                <a href="/Home/ProductDetail/1" class="btn food-menu-btn">Order Now</a>
-                                </div>
-
-                                <div class="wrapper">
-                                    <p class="category">Chicken</p>
-
-                                    <div class="rating-wrapper">
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                    </div>
-                                </div>
-
-                                <h3 class="h3 card-title">Fried Chicken Unlimited</h3>
-
-                                <div class="price-wrapper">
-
-                                    <p class="price-text">Price:</p>
-
-                                    <data class="price">$49.00</data>
-
-                                    <del class="del" value="69.00">$69.00</del>
-
-                                </div>
-
-                            </div>
-                        </li>
-
-                        <li>
-                            <div class="food-menu-card">
-
-                                <div class="card-banner">
-                                    <img src="/images/food-menu-2.png" width="300" height="300" loading="lazy"
-                                         alt="Burger King Whopper" class="w-100">
-
-                                    <div class="badge">-10%</div>
-
-                                    <button class="btn food-menu-btn">Order Now</button>
-                                </div>
-
-                                <div class="wrapper">
-                                    <p class="category">Noddles</p>
-
-                                    <div class="rating-wrapper">
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                    </div>
-                                </div>
-
-                                <h3 class="h3 card-title">Burger King Whopper</h3>
-
-                                <div class="price-wrapper">
-
-                                    <p class="price-text">Price:</p>
-
-                                    <data class="price" value="29.00">$29.00</data>
-
-                                    <del class="del">$39.00</del>
-
-                                </div>
-
-                            </div>
-                        </li>
-
-                        <li>
-                            <div class="food-menu-card">
-
-                                <div class="card-banner">
-                                    <img src="/images/food-menu-3.png" width="300" height="300" loading="lazy"
-                                         alt="White Castle Pizzas" class="w-100">
-
-                                    <div class="badge">-25%</div>
-
-                                    <button class="btn food-menu-btn">Order Now</button>
-                                </div>
-
-                                <div class="wrapper">
-                                    <p class="category">Pizzas</p>
-
-                                    <div class="rating-wrapper">
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                    </div>
-                                </div>
-
-                                <h3 class="h3 card-title">White Castle Pizzas</h3>
-
-                                <div class="price-wrapper">
-
-                                    <p class="price-text">Price:</p>
-
-                                    <data class="price" value="49.00">$49.00</data>
-
-                                    <del class="del">$69.00</del>
-
-                                </div>
-
-                            </div>
-                        </li>
-
-                        <li>
-                            <div class="food-menu-card">
-
-                                <div class="card-banner">
-                                    <img src="/images/food-menu-4.png" width="300" height="300" loading="lazy"
-                                         alt="Bell Burrito Supreme" class="w-100">
-
-                                    <div class="badge">-20%</div>
-
-                                    <button class="btn food-menu-btn">Order Now</button>
-                                </div>
-
-                                <div class="wrapper">
-                                    <p class="category">Burrito</p>
-
-                                    <div class="rating-wrapper">
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                    </div>
-                                </div>
-
-                                <h3 class="h3 card-title">Bell Burrito Supreme</h3>
-
-                                <div class="price-wrapper">
-
-                                    <p class="price-text">Price:</p>
-
-                                    <data class="price" value="59.00 ">$59.00</data>
-
-                                    <del class="del">$69.00</del>
-
-                                </div>
-
-                            </div>
-                        </li>
-
-                        <li>
-                            <div class="food-menu-card">
-
-                                <div class="card-banner">
-                                    <img src="/images/food-menu-5.png" width="300" height="300" loading="lazy"
-                                         alt="Kung Pao Chicken BBQ" class="w-100">
-
-                                    <div class="badge">-5%</div>
-
-                                    <button class="btn food-menu-btn">Order Now</button>
-                                </div>
-
-                                <div class="wrapper">
-                                    <p class="category">Nuggets</p>
-
-                                    <div class="rating-wrapper">
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                    </div>
-                                </div>
-
-                                <h3 class="h3 card-title">Kung Pao Chicken BBQ</h3>
-
-                                <div class="price-wrapper">
-
-                                    <p class="price-text">Price:</p>
-
-                                    <data class="price" value="49.00">$49.00</data>
-
-                                    <del class="del">$69.00</del>
-
-                                </div>
-
-                            </div>
-                        </li>
-
-                        <li>
-                            <div class="food-menu-card">
-
-                                <div class="card-banner">
-                                    <img src="/images/food-menu-6.png" width="300" height="300" loading="lazy"
-                                         alt="Wendy's Chicken" class="w-100">
-
-                                    <div class="badge">-15%</div>
-
-                                    <button class="btn food-menu-btn">Order Now</button>
-                                </div>
-
-                                <div class="wrapper">
-                                    <p class="category">Chicken</p>
-
-                                    <div class="rating-wrapper">
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                        <ion-icon name="star"></ion-icon>
-                                    </div>
-                                </div>
-
-                                <h3 class="h3 card-title">Wendy's Chicken</h3>
-
-                                <div class="price-wrapper">
-
-                                    <p class="price-text">Price:</p>
-
-                                    <data class="price" value="49.00">$49.00</data>
-
-                                    <del class="del">$69.00</del>
-
-                                </div>
-
-                            </div>
-                        </li>
-
-                    </ul>
-
-
                 </div>
-            </section>
 
+                <ul class="food-menu-list grid-list" id="food-container">
+                    <li id="loading-spinner" style="text-align: center; width: 100%; padding: 20px;">
+                        <p>Đang tải dữ liệu món ăn...</p>
+                    </li>
+                </ul>
 
+                <hr>
 
-
+                <div class="d-flex justify-content-center mt-5" id="pagination-container" style="display: none;">
+                    <nav aria-label="Food Pagination">
+                        <ul class="pagination justify-content-center" id="food-pagination-list">
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </section>
 
             <!--
               - #CTA
@@ -646,9 +416,6 @@
             </section>
 
 
-
-
-
             <!--
               - #DELIVERY
             -->
@@ -683,222 +450,6 @@
             </section>
 
 
-
-
-
-            <!--
-              - #TESTIMONIALS
-            -->
-
-            <section class="section section-divider white testi">
-                <div class="container">
-
-                    <p class="section-subtitle">Testimonials</p>
-
-                    <h2 class="h2 section-title">
-                        Our Customers <span class="span">Reviews</span>
-                    </h2>
-
-                    <p class="section-text">
-                        Food is any substance consumed to provide nutritional
-                        support for an organism.
-                    </p>
-
-                    <ul class="testi-list has-scrollbar">
-
-                        <li class="testi-item">
-                            <div class="testi-card">
-
-                                <div class="profile-wrapper">
-
-                                    <figure class="avatar">
-                                        <img src="/images/avatar-1.jpg" width="80" height="80" loading="lazy" alt="Robert William">
-                                    </figure>
-
-                                    <div>
-                                        <h3 class="h4 testi-name">Robert William</h3>
-
-                                        <p class="testi-title">CEO Kingfisher</p>
-                                    </div>
-
-                                </div>
-
-                                <blockquote class="testi-text">
-                                    "I would be lost without restaurant. I would like to personally thank you for your outstanding
-                                    product."
-                                </blockquote>
-
-                                <div class="rating-wrapper">
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-icon name="star"></ion-icon>
-                                </div>
-
-                            </div>
-                        </li>
-
-                        <li class="testi-item">
-                            <div class="testi-card">
-
-                                <div class="profile-wrapper">
-
-                                    <figure class="avatar">
-                                        <img src="/images/avatar-2.jpg" width="80" height="80" loading="lazy" alt="Thomas Josef">
-                                    </figure>
-
-                                    <div>
-                                        <h3 class="h4 testi-name">Thomas Josef</h3>
-
-                                        <p class="testi-title">CEO Getforce</p>
-                                    </div>
-
-                                </div>
-
-                                <blockquote class="testi-text">
-                                    "I would be lost without restaurant. I would like to personally thank you for your outstanding
-                                    product."
-                                </blockquote>
-
-                                <div class="rating-wrapper">
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-icon name="star"></ion-icon>
-                                </div>
-
-                            </div>
-                        </li>
-
-                        <li class="testi-item">
-                            <div class="testi-card">
-
-                                <div class="profile-wrapper">
-
-                                    <figure class="avatar">
-                                        <img src="/images/avatar-3.jpg" width="80" height="80" loading="lazy" alt="Charles Richard">
-                                    </figure>
-
-                                    <div>
-                                        <h3 class="h4 testi-name">Charles Richard</h3>
-
-                                        <p class="testi-title">CEO Angela</p>
-                                    </div>
-
-                                </div>
-
-                                <blockquote class="testi-text">
-                                    "I would be lost without restaurant. I would like to personally thank you for your outstanding
-                                    product."
-                                </blockquote>
-
-                                <div class="rating-wrapper">
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-icon name="star"></ion-icon>
-                                </div>
-
-                            </div>
-                        </li>
-
-                    </ul>
-
-                </div>
-            </section>
-
-
-
-
-
-
-            <!--
-              - #BANNER
-            -->
-
-            <section class="section section-divider gray banner">
-                <div class="container">
-
-                    <ul class="banner-list">
-
-                        <li class="banner-item banner-lg">
-                            <div class="banner-card">
-
-                                <img src="/images/banner-1.jpg" width="550" height="450" loading="lazy"
-                                     alt="Discount For Delicious Tasty Burgers!" class="banner-img">
-
-                                <div class="banner-item-content">
-                                    <p class="banner-subtitle">50% Off Now!</p>
-
-                                    <h3 class="banner-title">Discount For Delicious Tasty Burgers!</h3>
-
-                                    <p class="banner-text">Sale off 50% only this week</p>
-
-                                    <button class="btn">Order Now</button>
-                                </div>
-
-                            </div>
-                        </li>
-
-                        <li class="banner-item banner-sm">
-                            <div class="banner-card">
-
-                                <img src="/images/banner-2.jpg" width="550" height="465" loading="lazy" alt="Delicious Pizza"
-                                     class="banner-img">
-
-                                <div class="banner-item-content">
-                                    <h3 class="banner-title">Delicious Pizza</h3>
-
-                                    <p class="banner-text">50% off Now</p>
-
-                                    <button class="btn">Order Now</button>
-                                </div>
-
-                            </div>
-                        </li>
-
-                        <li class="banner-item banner-sm">
-                            <div class="banner-card">
-
-                                <img src="/images/banner-3.jpg" width="550" height="465" loading="lazy" alt="American Burgers"
-                                     class="banner-img">
-
-                                <div class="banner-item-content">
-                                    <h3 class="banner-title">American Burgers</h3>
-
-                                    <p class="banner-text">50% off Now</p>
-
-                                    <button class="btn">Order Now</button>
-                                </div>
-
-                            </div>
-                        </li>
-
-                        <li class="banner-item banner-md">
-                            <div class="banner-card">
-
-                                <img src="/images/banner-4.jpg" width="550" height="220" loading="lazy" alt="Tasty Buzzed Pizza"
-                                     class="banner-img">
-
-                                <div class="banner-item-content">
-                                    <h3 class="banner-title">Tasty Buzzed Pizza</h3>
-
-                                    <p class="banner-text">Sale off 50% only this week</p>
-
-                                    <button class="btn">Order Now</button>
-                                </div>
-
-                            </div>
-                        </li>
-
-                    </ul>
-
-                </div>
-            </section>
-
         </article>
     </main>
 
@@ -912,18 +463,21 @@
 
 
 
-    <!--Đã chỉnh sửa-->
 
-    <!--
-      - custom   link
-    -->
+@section Scripts {
+
+    <!-- Script gọi API -->
+    <script type="module" src="/js/foodService.js"></script>
+    <script type="module" src="/js/categoryService.js"></script>
+    <script type="module" src="/js/loadMenu.js"></script>
+
+    <!-- Script giao diện -->
     <script src="/js/script.js" defer></script>
 
-    <!--
-      - ionicon link
-    -->
+    <!-- Ionicons -->
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+}
 
 </html>
 <!--Đã chỉnh sửa-->
