@@ -1,5 +1,6 @@
 ﻿using BUS.Services;
 using BUS.Services.AddressService;
+using BUS.Services.CartService;
 using BUS.Services.DashboardService;
 using BUS.Services.PaymentService;
 using BUS.Services.RestaurantService;
@@ -48,6 +49,16 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); 
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// ĐĂNG KÝ CÁC SERVICES
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -60,6 +71,7 @@ builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<ICartService, CartService>(); 
 
 builder.Services.AddHttpContextAccessor();
 // Thêm dịch vụ "Xác thực"
@@ -118,15 +130,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseHsts();//New
+app.UseHsts();
 
-app.UseStaticFiles();//New
+app.UseStaticFiles();
 
-app.UseCors("AllowAll");//New
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllers();
 
