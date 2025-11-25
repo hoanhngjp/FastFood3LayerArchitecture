@@ -1,4 +1,4 @@
-﻿const CATEGORY_BASE_URL = 'http://localhost:5123/categories';
+﻿const CATEGORY_BASE_URL = 'https://localhost:7104/categories';
 
 /**
  * Hàm chung để gọi API cho Category (Sử dụng lại logic của apiCall nhưng với URL Category)

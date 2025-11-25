@@ -7,30 +7,18 @@
 
 <div class="card shadow-sm">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Danh sách Khách hàng (<span id="customer-count">532</span>)</h5>
+        <h5 class="mb-0">Danh sách Khách hàng (<span id="customer-count">Đang tải...</span>)</h5>
         <button class="btn btn-warning text-dark fw-bold" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
             <i class="bi bi-person-plus-fill me-2"></i> Thêm Khách hàng mới
         </button>
     </div>
     <div class="card-body">
 
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Tìm kiếm theo tên, SĐT hoặc Email...">
-                    <button class="btn btn-outline-secondary" type="button"><i class="bi bi-search"></i></button>
-                </div>
-            </div>
-            <div class="col-md-6 d-flex justify-content-end">
-                <select class="form-select w-auto">
-                    <option selected>Sắp xếp: Tổng đơn (Giảm dần)</option>
-                    <option>Sắp xếp: Tên (A-Z)</option>
-                    <option>Lọc: Khách hàng thân thiết</option>
-                </select>
-            </div>
+        <div id="loading-area-customer" class="text-center p-5" style="display: none;">
+            <div class="spinner-border text-primary me-2" role="status"></div>
+            <p class="mt-2 text-muted">Đang tải danh sách khách hàng...</p>
         </div>
-
-        <p class="text-muted small">Quản lý thông tin, lịch sử đặt hàng và điểm tích lũy của khách hàng.</p>
+        <div id="error-message-area-customer" class="alert alert-danger" style="display: none;"></div>
 
         <div class="table-responsive">
             <table class="table table-striped table-hover align-middle">
@@ -45,43 +33,8 @@
                         <th>Hành động</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>C001</td>
-                        <td><a href="#" class="text-decoration-none fw-bold">Nguyễn A</a></td>
-                        <td>nguyen.a@mail.com</td>
-                        <td>090-123-4567</td>
-                        <td>15</td>
-                        <td><span class="badge bg-success">1500</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" title="Chỉnh sửa"><i class="bi bi-pencil"></i></button>
-                            <button class="btn btn-sm btn-outline-danger" title="Xóa" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>C002</td>
-                        <td><a href="#" class="text-decoration-none fw-bold">Trần B</a></td>
-                        <td>tran.b@mail.com</td>
-                        <td>090-987-6543</td>
-                        <td>8</td>
-                        <td><span class="badge bg-secondary">800</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" title="Chỉnh sửa"><i class="bi bi-pencil"></i></button>
-                            <button class="btn btn-sm btn-outline-danger" title="Xóa" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr class="table-warning">
-                        <td>C003</td>
-                        <td><a href="#" class="text-decoration-none fw-bold text-dark">Lê Văn C (VIP)</a></td>
-                        <td>le.c@mail.com</td>
-                        <td>091-222-3333</td>
-                        <td>45</td>
-                        <td><span class="badge bg-danger">4500</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" title="Chỉnh sửa"><i class="bi bi-pencil"></i></button>
-                            <button class="btn btn-sm btn-outline-danger" title="Xóa" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>
+                <tbody id="customers-table-body">
+
                 </tbody>
             </table>
         </div>
@@ -98,55 +51,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title" id="addCustomerModalLabel">Thêm Khách hàng mới</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label for="new-customer-name" class="form-label">Tên Khách hàng (*)</label>
-                        <input type="text" class="form-control" id="new-customer-name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="new-customer-phone" class="form-label">Số điện thoại (*)</label>
-                        <input type="tel" class="form-control" id="new-customer-phone" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="new-customer-email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="new-customer-email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="new-customer-address" class="form-label">Địa chỉ</label>
-                        <input type="text" class="form-control" id="new-customer-address">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="submit" class="btn btn-warning text-dark">Lưu và Thêm</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-labelledby="deleteCustomerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteCustomerModalLabel">Xác nhận Xóa</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Bạn có chắc chắn muốn xóa khách hàng **Nguyễn A (C001)** không? Thao tác này không thể hoàn tác.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                <button type="button" class="btn btn-danger">Xóa Vĩnh Viễn</button>
-            </div>
-        </div>
-    </div>
-</div>
+<script type="module" src="/js/services/userService.js"></script>
+<script type="module" src="/js/pages/adminCustomer.js"></script>

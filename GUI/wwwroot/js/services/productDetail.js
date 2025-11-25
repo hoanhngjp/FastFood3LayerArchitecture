@@ -1,6 +1,6 @@
-﻿import { getFoodDetail } from './foodService.js';
-
-const API_BASE_URL = 'http://localhost:5278';
+﻿// /js/services/productDetail.js
+import { getFoodDetail } from './foodService.js';
+import { addItemToCart, formatCurrency } from './cartService.js';
 
 // 2. Định nghĩa các DOM elements
 const productTitleEl = document.getElementById('product-title');
@@ -15,26 +15,24 @@ const reviewCountEl = document.getElementById('review-count');
 const loadingMessageEl = document.getElementById('loading-message');
 const contentEl = document.getElementById('product-detail-content');
 const errorMessageEl = document.getElementById('error-message');
+const ratingWrapperEl = document.getElementById('product-rating');
+const qtyInputEl = document.querySelector('.qty-input');
+const qtyBtnMinus = document.getElementById('button-addon1');
+const qtyBtnPlus = document.getElementById('button-addon2');
+const addToCartBtn = document.getElementById('add-to-cart-btn');
 
-// Hàm format tiền tệ (Dùng định dạng VNĐ chuẩn)
-const formatCurrency = (amount) => {
-    const value = parseFloat(amount || 0);
+// Biến lưu trữ chi tiết món ăn đã tải
+let currentFoodDetail = null;
 
-    return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND',
-        minimumFractionDigits: 0
-    }).format(value);
-};
 
 /**
- * Hàm render số lượng sao (Giữ nguyên)
+ * Hàm render số lượng sao 
  * @param {number} rating - Điểm đánh giá (ví dụ: 4.5)
  */
 const renderRatingStars = (rating) => {
-    const ratingWrapperEl = document.getElementById('product-rating');
     if (!ratingWrapperEl) return;
 
+    // Xóa các ngôi sao cũ
     ratingWrapperEl.querySelectorAll('i.bi-star-fill, i.bi-star-half, i.bi-star').forEach(el => el.remove());
 
     const maxStars = 5;
@@ -55,11 +53,7 @@ const renderRatingStars = (rating) => {
         starsHTML += '<i class="bi bi-star"></i>';
     }
 
-    if (reviewCountEl) {
-        reviewCountEl.insertAdjacentHTML('beforebegin', starsHTML);
-    } else {
-        ratingWrapperEl.innerHTML = starsHTML;
-    }
+    ratingWrapperEl.innerHTML = starsHTML;
 };
 
 
@@ -67,12 +61,13 @@ const renderRatingStars = (rating) => {
  * Hàm chính để tải và hiển thị chi tiết món ăn
  */
 async function loadProductDetail() {
+    // foodId được lấy từ <script> block trong ProductDetail.cshtml
     const foodId = window.foodId;
 
     if (!foodId) {
         if (loadingMessageEl) loadingMessageEl.style.display = 'none';
         if (errorMessageEl) {
-            errorMessageEl.textContent = 'Lỗi: Không tìm thấy ID món ăn trong URL. Vui lòng kiểm tra Route.';
+            errorMessageEl.textContent = 'Lỗi: Không tìm thấy ID món ăn trong URL.';
             errorMessageEl.style.display = 'block';
         }
         return;
@@ -84,6 +79,7 @@ async function loadProductDetail() {
 
     try {
         const food = await getFoodDetail(foodId);
+        currentFoodDetail = food; // Lưu lại chi tiết món ăn đã tải
 
         if (loadingMessageEl) loadingMessageEl.style.display = 'none';
 
@@ -91,23 +87,17 @@ async function loadProductDetail() {
             throw new Error("Món ăn với ID này không tồn tại.");
         }
 
- 
+        // --- HIỂN THỊ DỮ LIỆU ---
         if (productTitleEl) productTitleEl.textContent = food.foodName || 'Tên món ăn không rõ';
         if (productCategoryEl) productCategoryEl.textContent = food.categoryName || 'General';
 
-
-        // LOGIC ẢNH ĐÃ ĐỒNG BỘ 
         if (productImageEl) {
             const fallbackSrc = '/images/food-menu-default.png';
             const imageRelativeUrl = food.imgUrl || fallbackSrc;
-            const imageSrc = imageRelativeUrl.startsWith('/')
-                ? API_BASE_URL + imageRelativeUrl
-                : imageRelativeUrl;
-
+            const imageSrc = imageRelativeUrl.startsWith('/') ? imageRelativeUrl : `/${imageRelativeUrl}`;
             productImageEl.src = imageSrc;
             productImageEl.alt = food.foodName;
         }
-
 
         // Giá và Giảm giá
         const currentPrice = food.price || 0;
@@ -116,7 +106,6 @@ async function loadProductDetail() {
 
         if (priceCurrentEl) {
             priceCurrentEl.textContent = formatCurrency(currentPrice);
-            priceCurrentEl.value = currentPrice;
         }
 
         if (oldPrice > currentPrice && priceOldEl) {
@@ -159,5 +148,71 @@ async function loadProductDetail() {
     }
 }
 
-// Khởi chạy khi DOM đã sẵn sàng
-document.addEventListener('DOMContentLoaded', loadProductDetail);
+/**
+ * Thiết lập logic cho các nút tăng/giảm số lượng
+ */
+function setupQuantityControls() {
+    if (!qtyInputEl || !qtyBtnMinus || !qtyBtnPlus) return;
+
+    const minQty = parseInt(qtyInputEl.min) || 1;
+
+    qtyBtnPlus.addEventListener('click', () => {
+        let currentValue = parseInt(qtyInputEl.value) || minQty;
+        qtyInputEl.value = currentValue + 1;
+        qtyInputEl.blur();
+    });
+
+    qtyBtnMinus.addEventListener('click', () => {
+        let currentValue = parseInt(qtyInputEl.value) || minQty;
+        if (currentValue > minQty) {
+            qtyInputEl.value = currentValue - 1;
+        }
+        qtyInputEl.blur();
+    });
+
+    qtyInputEl.addEventListener('change', () => {
+        let currentValue = parseInt(qtyInputEl.value);
+        if (isNaN(currentValue) || currentValue < minQty) {
+            qtyInputEl.value = minQty;
+        }
+    });
+}
+
+/**
+ * Thiết lập chức năng Thêm vào Giỏ hàng
+ */
+function setupAddToCartHandler() {
+    if (!addToCartBtn) return;
+
+    addToCartBtn.addEventListener('click', () => {
+        if (!currentFoodDetail) {
+            // ... (xử lý lỗi)
+            return;
+        }
+
+        const quantity = parseInt(qtyInputEl.value) || 1;
+
+        try {
+            // Gọi hàm từ Cart Service để thêm món ăn vào Local Storage
+            addItemToCart(currentFoodDetail, quantity);
+
+            // BỎ alert() và thay bằng thông báo nhỏ (ví dụ Toast/Snackbar) nếu bạn muốn,
+            // hoặc chỉ cần cập nhật giỏ hàng ở header.
+            console.log(`Đã thêm thành công ${quantity} x ${currentFoodDetail.foodName} vào giỏ hàng.`);
+
+            // Tùy chọn: Reset số lượng về 1 sau khi thêm thành công
+            qtyInputEl.value = 1;
+
+        } catch (error) {
+            console.error('Lỗi khi thêm vào giỏ hàng:', error);
+            alert('Không thể thêm món ăn vào giỏ. Vui lòng thử lại.');
+        }
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadProductDetail();
+    setupQuantityControls();
+    setupAddToCartHandler();
+});

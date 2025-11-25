@@ -1,6 +1,4 @@
-﻿// File: wwwroot/js/signup.js
-
-import { signup } from './authService.js'; // Import hàm signup từ service
+﻿import { signup } from '../services/authService.js'; 
 
 const signupFormEl = document.getElementById('registerForm');
 const fullNameEl = document.getElementById('fullName');
@@ -49,7 +47,7 @@ async function handleSignup(e) {
     try {
         // 2. GỌI SERVICE API
         // Thay đổi role từ 'USER' thành 'user' để đảm bảo tính nhất quán (Case-sensitivity)
-        await signup(fullName, email, password, 'User');
+        await signup(fullName, email, password, 'customer');
 
         // Đăng ký thành công
         displayMessage("Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.", false);

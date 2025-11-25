@@ -342,39 +342,26 @@
                     Food is any substance consumed to provide nutritional support for an organism.
                 </p>
 
+                <div id="food-error-message-area" class="alert alert-danger mx-auto" style="display: none; max-width: 800px; margin-bottom: 25px;">
+                    Lỗi tải dữ liệu. Vui lòng kiểm tra kết nối API.
+                </div>
+
                 <div class="category-filter-wrapper">
-                    <ul class="filter-list" id="category-list-container" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-
-                        <li>
-                            <button class="filter-btn active">All</button>
-                        </li>
-                        <li>
-                            <button class="filter-btn">Pizza</button>
-                        </li>
-                        <li>
-                            <button class="filter-btn">Burger</button>
-                        </li>
-                        <li>
-                            <button class="filter-btn">Drinks</button>
-                        </li>
-                        <li>
-                            <button class="filter-btn">Sandwich</button>
-                        </li>
-
+                    <ul class="filter-list" id="category-filter-list" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
                     </ul>
                 </div>
 
                 <ul class="food-menu-list grid-list" id="food-container">
-                    <li id="loading-spinner" style="text-align: center; width: 100%; padding: 20px;">
+                    <li id="food-loading-area" style="text-align: center; width: 100%; padding: 20px;">
                         <p>Đang tải dữ liệu món ăn...</p>
                     </li>
                 </ul>
 
                 <hr>
 
-                <div class="d-flex justify-content-center mt-5" id="pagination-container" style="display: none;">
+                <div class="d-flex justify-content-center mt-5" id="food-pagination-area" style="display: none;">
                     <nav aria-label="Food Pagination">
-                        <ul class="pagination justify-content-center" id="food-pagination-list">
+                        <ul class="pagination justify-content-center" id="food-pagination">
                         </ul>
                     </nav>
                 </div>
@@ -461,23 +448,11 @@
         <ion-icon name="chevron-up"></ion-icon>
     </a>
 
-
-
-
 @section Scripts {
+    <script type="module" src="/js/services/foodService.js"></script>
+    <script type="module" src="/js/services/categoryService.js"></script>
+    <script type="module" src="/js/pages/loadMenu.js"></script>
 
-    <!-- Script gọi API -->
-    <script type="module" src="/js/foodService.js"></script>
-    <script type="module" src="/js/categoryService.js"></script>
-    <script type="module" src="/js/loadMenu.js"></script>
-
-    <!-- Script giao diện -->
+    <script type="module" src="/js/authChecker.js"></script>
     <script src="/js/script.js" defer></script>
-
-    <!-- Ionicons -->
-    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 }
-
-</html>
-<!--Đã chỉnh sửa-->
