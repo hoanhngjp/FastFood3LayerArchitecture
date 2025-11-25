@@ -17,13 +17,11 @@ namespace BUS.Services
     {
         private readonly IUnitOfWork _uow;
         private readonly IConfiguration _config;
-        //private readonly ITokenBlacklistRepository? _blacklist;
 
         public AuthService(IUnitOfWork uow, IConfiguration config)
         {
             _uow = uow;
             _config = config;
-            // = blacklist;
         }
 
         public async Task<int> SignUpAsync(SignupRequest dto)
@@ -34,10 +32,8 @@ namespace BUS.Services
                 || string.IsNullOrWhiteSpace(dto.Role))
                 throw new ArgumentException("Missing required fields");
 
-            // Truy vấn thẳng vào bảng UserRole để tìm RoleID.
             var roleName = dto.Role.ToLowerInvariant();
 
-            // Giả sử _uow.UserRoles là IGenericRepository<UserRole>
             var roleEntity = (await _uow.UserRoles.FindAsync(r => r.RoleName == roleName)).FirstOrDefault();
 
             if (roleEntity == null)
@@ -73,7 +69,12 @@ namespace BUS.Services
             if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid credentials");
             if (user.UserRole == null)
-                throw new InvalidOperationException("User role not loaded.");
+            {
+                var role = await _uow.UserRoles.GetByIdAsync(user.RoleID);
+                if (role == null)
+                    throw new InvalidOperationException($"Critical Error: User {user.UserID} has invalid RoleID {user.RoleID}.");
+                user.UserRole = role;
+            }
 
             // Tạo Access Token
             var jwtSettings = _config.GetSection("Jwt");
@@ -87,8 +88,8 @@ namespace BUS.Services
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7); // Hạn 7 ngày
 
-            _uow.Users.Update(user); // Đánh dấu User là "đã thay đổi"
-            await _uow.SaveChangesAsync(); // Lưu thay đổi
+            _uow.Users.Update(user);
+            await _uow.SaveChangesAsync();
 
             // Trả về cho Controller
             return new AuthResponse
@@ -117,7 +118,6 @@ namespace BUS.Services
             if (string.IsNullOrWhiteSpace(refreshToken))
                 throw new UnauthorizedAccessException("Invalid refresh token.");
 
-            // Tìm user 
             var user = (await _uow.Users
                 .FindAsync(u => u.RefreshToken == refreshToken))
                 .FirstOrDefault();
@@ -125,15 +125,13 @@ namespace BUS.Services
             if (user == null)
                 throw new UnauthorizedAccessException("Invalid refresh token.");
 
-            // Kiểm tra Refresh Token
             if (user.RefreshTokenExpiry == null || user.RefreshTokenExpiry <= DateTime.UtcNow)
                 throw new UnauthorizedAccessException("Refresh token expired.");
 
-            // Tải Role
             if (user.UserRole == null)
             {
                 var role = await _uow.UserRoles.GetByIdAsync(user.RoleID);
-                user.UserRole = role; // Gán tạm vào
+                user.UserRole = role;
             }
 
             // Tạo Access Token MỚI

@@ -105,35 +105,26 @@ namespace BUS.Services
                 PaymentUrl = paymentUrl
             };
         }
-
         public async Task<UpdateStatusResult> UpdateStatusAsync(int orderId, string status)
         {
-            // Bước 1: Kiểm tra Status
             var statusEntity = (await _unitOfWork.Repository<OrderStatus>()
-                                .FindAsync(s => s.StatusName == status))
-                                .FirstOrDefault();
-
-            // SỬA: Không "throw", chỉ "báo cáo"
+                                    .FindAsync(s => s.StatusName == status))
+                                    .FirstOrDefault();
             if (statusEntity == null)
                 return UpdateStatusResult.StatusNotFound;
 
-            // Bước 2: Kiểm tra Order
             var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
-
             if (order == null)
                 return UpdateStatusResult.OrderNotFound;
 
-            // Bước 3: Cập nhật và lưu
             order.StatusID = statusEntity.StatusID;
             order.UpdatedAt = DateTime.UtcNow;
 
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.SaveChangesAsync();
 
-            // Báo cáo thành công
             return UpdateStatusResult.Success;
         }
-
         public async Task<bool> DeleteAsync(int id)
         {
             var order = await _unitOfWork.Orders.GetByIdAsync(id);
@@ -143,7 +134,79 @@ namespace BUS.Services
             await _unitOfWork.SaveChangesAsync();
             return true;
         }
+        private async Task<bool> CheckRestaurantOwnershipAsync(int managerUserId, int restaurantId)
+        {
+            var restaurant = await _unitOfWork.Restaurants.GetByIdAsync(restaurantId);
 
+            if (restaurant == null)
+                return false;
+
+            return restaurant.ManagerID == managerUserId;
+        }
+        private async Task<(Order? order, UpdateStatusResult result)> CheckOrderOwnershipAsync(int orderId, int managerUserId)
+        {
+            var order = await _unitOfWork.Orders.GetByIdWithDetailsAsync(orderId);
+
+            if (order == null)
+                return (null, UpdateStatusResult.OrderNotFound);
+
+            if (order.Restaurant == null)
+                throw new InvalidOperationException($"Lỗi Include: GetByIdWithDetailsAsync({orderId}) phải 'Include' Restaurant.");
+
+            if (order.Restaurant.ManagerID != managerUserId)
+                return (null, UpdateStatusResult.PermissionDenied);
+
+            return (order, UpdateStatusResult.Success);
+        }
+        public async Task<IEnumerable<OrderDTO>> GetOrdersForRestaurantAsync(int restaurantId, string statusFilter, int managerUserId)
+        {
+            if (!await CheckRestaurantOwnershipAsync(managerUserId, restaurantId))
+            {
+                return Enumerable.Empty<OrderDTO>();
+            }
+
+            var allOrdersWithDetails = await _unitOfWork.Orders.GetAllWithDetailsAsync();
+            var filteredOrders = allOrdersWithDetails
+                .Where(o => o.RestaurantID == restaurantId &&
+                            o.OrderStatus != null &&
+                            o.OrderStatus.StatusName == statusFilter)
+                .OrderByDescending(o => o.OrderTime);
+
+            return filteredOrders.Select(MapToDTO);
+        }
+        public async Task<UpdateStatusResult> ConfirmOrderAsync(int orderId, int managerUserId)
+        {
+            var (order, result) = await CheckOrderOwnershipAsync(orderId, managerUserId);
+            if (result != UpdateStatusResult.Success)
+                return result;
+
+            if (order.OrderStatus.StatusName != "Pending")
+                return UpdateStatusResult.AlreadyProcessed;
+
+            var successStatus = (await _unitOfWork.Repository<PaymentTransactionStatus>().FindAsync(s => s.StatusName == "Success")).FirstOrDefault();
+            if (successStatus == null) throw new InvalidOperationException("Lỗi CSDL: Seed 'Success' status.");
+
+            var payment = (await _unitOfWork.Repository<PaymentTransaction>().FindAsync(
+                            p => p.OrderID == orderId && p.StatusID == successStatus.StatusID
+                           )).FirstOrDefault();
+
+            if (payment == null)
+                return UpdateStatusResult.NotPaid;
+
+            return await UpdateStatusAsync(orderId, "Confirmed");
+        }
+        public async Task<UpdateStatusResult> CancelOrderAsync(int orderId, int managerUserId)
+        {
+            var (order, result) = await CheckOrderOwnershipAsync(orderId, managerUserId);
+            if (result != UpdateStatusResult.Success)
+                return result;
+
+            var statusName = order.OrderStatus.StatusName;
+            if (statusName == "Cancelled" || statusName == "Delivered")
+                return UpdateStatusResult.AlreadyProcessed;
+
+            return await UpdateStatusAsync(orderId, "Cancelled");
+        }
         private OrderDTO MapToDTO(Order o)
         {
             return new OrderDTO

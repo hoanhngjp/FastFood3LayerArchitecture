@@ -1,5 +1,6 @@
 ﻿using BUS.Services;
 using BUS.Services.AddressService;
+using BUS.Services.DashboardService;
 using BUS.Services.PaymentService;
 using BUS.Services.RestaurantService;
 using DAT;
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 builder.Services.AddHttpContextAccessor();
 // Thêm dịch vụ "Xác thực"

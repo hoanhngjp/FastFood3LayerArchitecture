@@ -1,5 +1,5 @@
 ﻿using BUS.Services;
-using DAT.Entity; // <-- Đảm bảo using
+using DAT.Entity;
 using DAT.UnitOfWork;
 using DTO.DTO;
 using System;
@@ -27,7 +27,7 @@ public class FoodItemService : IFoodItemService
     public async Task<IEnumerable<FoodItemDTO>> GetFoodsByCategoryAsync(int categoryId)
     {
         var items = await _unitOfWork.FoodItems.GetByCategoryWithDetailsAsync(categoryId);
-        // CẢI TIẾN: Dùng hàm MapToDTO
+
         return items.Select(MapToDTO);
     }
 
@@ -36,13 +36,11 @@ public class FoodItemService : IFoodItemService
         var f = await _unitOfWork.FoodItems.GetByIdWithDetailsAsync(id);
         if (f == null) return null;
 
-        // CẢI TIẾN: Dùng hàm MapToDTO
         return MapToDTO(f);
     }
 
     public async Task AddAsync(FoodItemDTO dto)
     {
-        // Chúng ta cũng có thể tạo hàm MapToEntity, nhưng AddAsync khá đơn giản
         var entity = new DAT.Entity.FoodItem
         {
             FoodName = dto.FoodName,
@@ -57,20 +55,13 @@ public class FoodItemService : IFoodItemService
         await _unitOfWork.FoodItems.AddAsync(entity);
         await _unitOfWork.SaveChangesAsync();
     }
-
-    // --- CẢI TIẾN LỚN ---
     public async Task<bool> UpdateAsync(FoodItemDTO dto)
     {
-        // 1. Lấy entity.
-        // Lưu ý: Dùng GetByIdAsync (của Generic) là đủ,
-        // vì chúng ta không cần .Include() chi tiết khi chỉ Update.
         var entity = await _unitOfWork.FoodItems.GetByIdAsync(dto.FoodId);
 
-        // 2. Trả về false nếu không tìm thấy. Không throw nữa!
         if (entity == null)
             return false;
 
-        // 3. Ánh xạ các thay đổi
         entity.FoodName = dto.FoodName;
         entity.Description = dto.Description;
         entity.Price = dto.Price;
@@ -79,11 +70,9 @@ public class FoodItemService : IFoodItemService
         entity.UpdatedAt = DateTime.UtcNow;
         entity.CategoryID = dto.CategoryId;
 
-        // 4. Cập nhật và lưu
         _unitOfWork.FoodItems.Update(entity);
         await _unitOfWork.SaveChangesAsync();
 
-        // 5. Trả về true (thành công)
         return true;
     }
 

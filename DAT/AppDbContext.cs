@@ -16,7 +16,7 @@ namespace DAT
         public DbSet<Restaurant> Restaurants { get; set; }
 
         // Phần Food & Category
-        public DbSet<Category> Categories { get; set; } // Sửa "Category" thành "Categories" cho chuẩn
+        public DbSet<Category> Categories { get; set; }
         public DbSet<FoodStatus> FoodStatus { get; set; }
         public DbSet<FoodItem> FoodItems { get; set; }
 
