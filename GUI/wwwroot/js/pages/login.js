@@ -34,9 +34,6 @@ async function handleLogin(e) {
         // Thành công
         displayMessage("Đăng nhập thành công!", false);
 
-        // Backend bạn trả về { UserID, Token, ... } nên lưu Token nếu cần thiết
-        // if (data.Token) localStorage.setItem("accessToken", data.Token);
-
         window.location.href = '/Home/Index';
 
     } catch (error) {

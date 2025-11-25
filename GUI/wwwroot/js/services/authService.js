@@ -1,20 +1,25 @@
-﻿// /js/services/authService.js
-const AUTH_BASE_URL = 'https://localhost:7104/auth';
+﻿const AUTH_BASE_URL = 'https://localhost:7104/auth';
+// Bỏ TOKEN_KEY và các hàm get/removeLocalToken vì ta dùng Cookie
 
 /**
- * Hàm chung để gọi API Auth (POST)
+ * Hàm chung để gọi API Auth (POST, GET, etc.)
+ * SỬ DỤNG CREDENTIALS: 'include' ĐỂ GỬI COOKIE
  * @param {string} endpoint - Ví dụ: '/signup', '/login', '/logout'
- * @param {object | null} data - Dữ liệu đăng ký/đăng nhập, hoặc null nếu không cần body.
+ * @param {object | null} data - Dữ liệu body.
+ * @param {string} method - Phương thức HTTP (mặc định: 'POST').
  * @returns {Promise<any>}
  */
-async function authApiCall(endpoint, data) {
+async function authApiCall(endpoint, data = null, method = 'POST') {
     const url = `${AUTH_BASE_URL}${endpoint}`;
 
     const options = {
-        method: 'POST',
+        method: method,
+        // *** ĐIỂM SỬA QUAN TRỌNG NHẤT ***
+        // Bắt buộc phải thêm để trình duyệt gửi cookie (access_token) đến Server.
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
+            // Bỏ Authorization Header vì token nằm trong cookie
         },
     };
 
@@ -31,10 +36,16 @@ async function authApiCall(endpoint, data) {
                 responseData = await response.json();
             }
         } catch (e) {
-            // Lỗi khi parse JSON
+            // Lỗi khi parse JSON (có thể xảy ra với 204 NoContent)
         }
 
         if (!response.ok) {
+            // Xử lý lỗi 401 Unauthorized
+            if (response.status === 401) {
+                // Không cần xóa token cục bộ vì nó nằm trong HttpOnly Cookie
+                throw new Error("Phiên đăng nhập hết hạn hoặc không hợp lệ.");
+            }
+
             const errorMessage = responseData.error || responseData.message || response.statusText || "Lỗi kết nối server";
             throw new Error(errorMessage);
         }
@@ -47,43 +58,8 @@ async function authApiCall(endpoint, data) {
     }
 }
 
-/**
- * Hàm gọi API GET (chủ yếu dùng cho /session)
- * @param {string} endpoint - Ví dụ: '/session'
- * @returns {Promise<any | null>}
- */
-async function authApiCallGet(endpoint) {
-    const url = `${AUTH_BASE_URL}${endpoint}`;
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (response.status === 401) {
-            return null; // Không xác thực (chưa đăng nhập)
-        }
-
-        if (!response.ok) {
-            let responseData;
-            try { responseData = await response.json(); } catch (e) { responseData = {}; }
-            throw new Error(responseData.message || `Lỗi GET API: ${response.status}`);
-        }
-
-        return await response.json();
-
-    } catch (error) {
-        console.error(`Lỗi trong Auth API GET ${endpoint}:`, error);
-        return null;
-    }
-}
-
-
 // ----------------------------------------------------
-// CÁC PHƯƠNG THỨC XÁC THỰC
+// CÁC PHƯƠNG THỨC XÁC THỰC EXPORT
 // ----------------------------------------------------
 
 /**
@@ -95,53 +71,49 @@ export const signup = (fullName, email, password, role = 'customer') => {
 
 /**
  * [POST] Đăng nhập (/auth/login)
+ * Server sẽ tự thiết lập HttpOnly Cookies khi thành công (Backend đã làm)
  */
 export const login = async (email, password) => {
+    // API call sẽ nhận lại Cookie access_token và refresh_token qua header
     const responseData = await authApiCall('/login', { email, password });
-
-    // ⚠️ Nếu Server trả về accessToken trong body:
-    if (responseData && responseData.accessToken) {
-        localStorage.setItem('accessToken', responseData.accessToken);
-    }
-
+    // Không cần lưu token vào Local Storage nữa!
     return responseData;
 };
 
 /**
  * [POST] Đăng xuất (/auth/logout)
+ * Server sẽ xóa cookie (Backend đã làm)
  */
-export const logout = () => {
-    return authApiCall('/logout', null);
+export const logout = async () => {
+    // Gọi API để server xóa cookie
+    const result = await authApiCall('/logout', null);
+    // Không cần xóa token cục bộ
+    return result;
 };
 
 /**
  * [GET] Kiểm tra trạng thái phiên làm việc (/auth/session)
- * Trả về thông tin người dùng nếu đã đăng nhập, hoặc null nếu chưa.
+ * Cookie access_token sẽ được gửi tự động (do credentials: 'include')
  */
 export const getSession = async () => {
-    const url = `${AUTH_BASE_URL}/session`;
-    const response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-
-    if (response.ok) {
-        return await response.json(); // Trả về SessionInfo
+    try {
+        // Nếu API trả về 200, userInfo hợp lệ. Nếu 401, nó sẽ ném lỗi.
+        return await authApiCall('/session', null, 'GET');
+    } catch (error) {
+        // Xử lý lỗi 401 (hoặc lỗi khác)
+        if (error.message.includes("Phiên đăng nhập hết hạn")) {
+            return null; // Trả về null nếu chưa đăng nhập/hết hạn
+        }
+        // Các lỗi nghiêm trọng khác (500) vẫn ném ra
+        throw error;
     }
-
-    if (response.status === 401) {
-        return null;
-    }
-
-    throw new Error(`Failed to load session: ${response.status}`);
 };
 
 /**
  * [POST] Làm mới token (/auth/refresh)
+ * Cookie refresh_token (path=/auth) sẽ được gửi tự động.
  */
 export const refreshToken = () => {
+    // API này cần cookie refresh_token để tạo cookie access_token mới
     return authApiCall('/refresh', null);
 };

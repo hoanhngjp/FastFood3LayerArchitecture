@@ -5,70 +5,64 @@
 
 <style>
     /* Tiêu đề Giỏ hàng và Tổng quan */
-        .cart-title {
-                color: #FF8800; /* Màu cam đậm */
-                font-weight: bold;
-                border-bottom: 2px solid #ffc107;
-                padding-bottom: 15px;
-                margin-bottom: 30px;
-
+    .cart-title {
+        color: #FF8800; /* Màu cam đậm */
+        font-weight: bold;
+        border-bottom: 2px solid #ffc107;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
     }
-
 
     /* Khung tổng hợp */
-        .cart-summary-area {
-                background-color: #fff9e6; /* Nền vàng nhạt */
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-
+    .cart-summary-area {
+        background-color: #fff9e6; /* Nền vàng nhạt */
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
     }
 
-        .summary-title {
-                color: #FF8800;
-                border-bottom: 1px solid #ffc107;
-                padding-bottom: 10px;
-                margin-bottom: 15px;
-                font-weight: bold;
-
+    .summary-title {
+        color: #FF8800;
+        border-bottom: 1px solid #ffc107;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        font-weight: bold;
     }
 
-        .summary-line {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 8px;
-                font-size: 1.1rem;
-
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 1.1rem;
     }
 
-        .summary-total {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 15px;
-                padding-top: 15px;
-                border-top: 2px dashed #ffc107;
-                font-size: 1.3rem;
-                font-weight: bold;
-
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 2px dashed #ffc107;
+        font-size: 1.3rem;
+        font-weight: bold;
     }
 
-        .total-price {
-                color: #E67E22; /* Màu cam đất */
-
+    .total-price {
+        color: #E67E22; /* Màu cam đất */
     }
 
+    .text-dark-orange { /* Đã thêm để đồng bộ màu */
+        color: #E67E22 !important;
+    }
 
     /* Ẩn các nút mũi tên cho input number */
-        .qty-input::-webkit-outer-spin-button,
-        .qty-input::-webkit-inner-spin-button {
-                -webkit-appearance: none;
-                margin: 0;
-
+    .qty-input::-webkit-outer-spin-button,
+    .qty-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
     }
 
-        .qty-input[type=number] {
-                -moz-appearance: textfield;
-
+    .qty-input[type=number] {
+        -moz-appearance: textfield;
     }
 </style>
 
@@ -126,5 +120,4 @@
 
 @section Scripts {
     <script type="module" src="/js/pages/cart.js"></script>
-
 }

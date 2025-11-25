@@ -1,17 +1,10 @@
 ﻿import { getSession, logout } from './services/authService.js';
+import { clearCart } from './services/cartService.js';
 
 const AUTH_CONTAINER_ID = 'auth-status-container';
-/**
- * Tạo markup HTML cho trạng thái ĐÃ ĐĂNG NHẬP
- * @param {object} userInfo - Thông tin người dùng (Email, Role, FullName)
- */
-function createLoggedInMarkup(userInfo) {
-    // Backend GetSessionInfo chưa trả về FullName. 
-    // Tạm thời lấy tên từ Email. Nếu Backend sửa để trả về FullName, code sẽ tự động ưu tiên.
-    const userNameFromEmail = userInfo.email ? userInfo.email.split('@')[0] : 'Người dùng';
 
-    // ⭐️ SỬ DỤNG EMAIL VÀO VAI TRÒ FULL NAME ⭐️
-    // Bạn cần Backend trả về 'fullName' hoặc 'FullName'
+function createLoggedInMarkup(userInfo) {
+    const userNameFromEmail = userInfo.email ? userInfo.email.split('@')[0] : 'Người dùng';
     const fullName = userInfo.fullName || userInfo.FullName || userNameFromEmail;
     const email = userInfo.email || 'Email không rõ';
 
@@ -32,9 +25,6 @@ function createLoggedInMarkup(userInfo) {
     `;
 }
 
-/**
- * Tạo markup HTML cho trạng thái CHƯA ĐĂNG NHẬP
- */
 function createLoggedOutMarkup() {
     return `
         <button class="btn btn-outline-warning" onclick="window.location.href='/Home/Login'">Login</button>
@@ -42,66 +32,88 @@ function createLoggedOutMarkup() {
     `;
 }
 
-
-/**
- * Hàm chính kiểm tra trạng thái và render giao diện
- */
-async function checkAuthStatus() {
-    
-
-    const container = document.getElementById(AUTH_CONTAINER_ID);  
-
-    if (!container) {
-        console.error('Lỗi: Không tìm thấy phần tử auth-status-container.');
-        return;
-    }
-
-    // ... (logic hiển thị loading) ...
-
-    try {
-        const userInfo = await getSession();
-        const IS_ADMIN_PAGE = window.location.pathname.startsWith('/Admin');
-
-        if (userInfo && userInfo.userID) {
-            // Kiểm tra vai trò Admin (Giả định vai trò được trả về là 'Admin')
-            const userRole = userInfo.role || userInfo.Role;
-
-            if (IS_ADMIN_PAGE && userRole !== 'Admin') {
-                // Người dùng đã đăng nhập NHƯNG không phải Admin -> Chuyển hướng
-                console.warn("Người dùng không có quyền Admin, chuyển hướng.");
-                window.location.href = '/Home/Index'; // Hoặc trang chủ
-                return; // Ngừng thực thi
-            }
-
-            // Nếu là Admin hợp lệ hoặc đang ở trang công khai
-            container.innerHTML = createLoggedInMarkup(userInfo);
-            // ... (gắn sự kiện logout) ...
-            document.getElementById('logout-btn').addEventListener('click', handleLogout);
-
-        } else {
-            // Chưa đăng nhập
-            container.innerHTML = createLoggedOutMarkup();
-            if (IS_ADMIN_PAGE) {
-                // Chưa đăng nhập và đang cố truy cập trang Admin -> Chuyển hướng đến Đăng nhập
-                window.location.href = '/Home/Login';
-            }
-        }
-    } catch (error) {
-        // ...
-    }
-}
-
-/**
- * Xử lý sự kiện Logout
- */
 async function handleLogout() {
     try {
         await logout();
-        // Sau khi logout thành công, chuyển hướng về trang chủ hoặc load lại trang
+        clearCart();
+        document.dispatchEvent(new Event('cartUpdated'));
         window.location.href = '/Home/Index';
     } catch (error) {
         console.error("Lỗi khi đăng xuất:", error);
         alert("Đăng xuất không thành công, vui lòng thử lại!");
+    }
+}
+
+async function checkAuthStatus() {
+    const container = document.getElementById(AUTH_CONTAINER_ID);
+
+    if (!container) {
+        attachAccountLogoutEvent();
+        return;
+    }
+
+    try {
+        const userInfo = await getSession();
+        const IS_ADMIN_PAGE = window.location.pathname.startsWith('/Admin');
+        // Xác định trang thanh toán (giả định URL chứa /checkout)
+        const IS_CHECKOUT_PAGE = window.location.pathname.toLowerCase().includes('/checkout');
+
+
+        if (userInfo && userInfo.userID) {
+            const userRole = userInfo.role || userInfo.Role;
+
+            if (IS_ADMIN_PAGE && userRole !== 'Admin') {
+                console.warn("Người dùng không có quyền Admin, chuyển hướng.");
+                window.location.href = '/Home/Index';
+                return;
+            }
+
+            container.innerHTML = createLoggedInMarkup(userInfo);
+            document.getElementById('logout-btn').addEventListener('click', handleLogout);
+
+        } else {
+            // Trường hợp CHƯA ĐĂNG NHẬP
+            container.innerHTML = createLoggedOutMarkup();
+
+            if (IS_ADMIN_PAGE) {
+                // Buộc đăng nhập nếu đang ở trang Admin
+                window.location.href = '/Home/Login';
+                return;
+            }
+
+            // ⭐ LOGIC BẮT BUỘC ĐĂNG NHẬP CHO TRANG THANH TOÁN (ĐÃ THÊM ALERT) ⭐
+            if (IS_CHECKOUT_PAGE) {
+                console.warn("Chưa đăng nhập, chuyển hướng đến trang Đăng nhập.");
+
+                // ⭐ THÊM ALERT TRƯỚC KHI CHUYỂN HƯỚNG ⭐
+                alert("Vui lòng đăng nhập để tiến hành thanh toán.");
+
+                // Lưu lại URL hiện tại để chuyển hướng quay lại sau khi đăng nhập thành công
+                const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.href = `/Home/Login?ReturnUrl=${redirectUrl}`;
+                return;
+            }
+        }
+    } catch (error) {
+        console.error("Lỗi kiểm tra phiên:", error);
+        const IS_CHECKOUT_PAGE_ON_ERROR = window.location.pathname.toLowerCase().includes('/checkout');
+        // Xử lý khi có lỗi API mà đang ở trang Checkout
+        if (IS_CHECKOUT_PAGE_ON_ERROR) {
+            alert("Vui lòng đăng nhập để tiến hành thanh toán.");
+            const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = `/Home/Login?ReturnUrl=${redirectUrl}`;
+        }
+    }
+
+    attachAccountLogoutEvent();
+}
+
+function attachAccountLogoutEvent() {
+    const accountLogoutBtn = document.getElementById('account-logout-btn');
+
+    if (accountLogoutBtn) {
+        accountLogoutBtn.addEventListener('click', handleLogout);
+        console.log('Đã gắn sự kiện Đăng xuất cho nút thanh bên trang cá nhân.');
     }
 }
 

@@ -105,59 +105,92 @@ export function renderCart() {
 
 
 /**
- * Thiết lập sự kiện cho các nút Tăng, Giảm, Xóa
+ * Thiết lập sự kiện cho các nút Tăng, Giảm, Xóa (click) và ô input số lượng (change)
  */
 function setupCartEvents() {
-    cartItemsListEl.addEventListener('click', (e) => {
-        const target = e.target.closest('button');
-        if (!target) return;
+    // 1. Xử lý sự kiện CLICK cho Tăng (+), Giảm (-), Xóa (Sử dụng Event Delegation)
+    // Đảm bảo chỉ thêm listener CLICK một lần duy nhất vào cartItemsListEl
+    if (!cartItemsListEl.dataset.clickListenerAdded) {
+        cartItemsListEl.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
 
-        const foodId = parseInt(target.dataset.id);
-        if (isNaN(foodId)) return;
+            const foodId = parseInt(target.dataset.id);
+            if (isNaN(foodId)) return;
 
-        let currentCart = getCart();
-        const itemIndex = currentCart.findIndex(item => item.id === foodId);
-        if (itemIndex === -1) return;
+            let currentCart = getCart();
+            const itemIndex = currentCart.findIndex(item => item.id === foodId);
+            if (itemIndex === -1) return;
 
-        let newQuantity = currentCart[itemIndex].quantity;
+            let shouldRender = false;
+            let currentQuantity = currentCart[itemIndex].quantity;
 
-        if (target.classList.contains('qty-btn-plus')) {
-            newQuantity++;
-            updateItemQuantity(foodId, newQuantity);
-        } else if (target.classList.contains('qty-btn-minus')) {
-            if (newQuantity > 1) {
-                newQuantity--;
-                updateItemQuantity(foodId, newQuantity);
+            if (target.classList.contains('qty-btn-plus')) {
+                // Tăng số lượng
+                updateItemQuantity(foodId, currentQuantity + 1);
+                shouldRender = true;
+            } else if (target.classList.contains('qty-btn-minus')) {
+                // Giảm số lượng (tối thiểu là 1)
+                if (currentQuantity > 1) {
+                    updateItemQuantity(foodId, currentQuantity - 1);
+                    shouldRender = true;
+                }
+            } else if (target.classList.contains('remove-item-btn')) {
+                // Xóa món
+                if (confirm('Bạn có chắc chắn muốn xóa món ăn này khỏi giỏ hàng?')) {
+                    removeItem(foodId);
+                    shouldRender = true;
+                }
             }
-        } else if (target.classList.contains('remove-item-btn')) {
-            if (confirm('Bạn có chắc chắn muốn xóa món ăn này khỏi giỏ hàng?')) {
-                removeItem(foodId);
+
+            // Render lại giỏ hàng nếu có thay đổi
+            if (shouldRender) {
+                renderCart();
             }
-        }
+        });
+        // Đánh dấu đã thêm listener CLICK
+        cartItemsListEl.dataset.clickListenerAdded = true;
+    }
 
-        // Render lại để cập nhật tổng tiền
-        renderCart();
-    });
 
-    cartItemsListEl.querySelectorAll('.qty-input').forEach(input => {
-        if (!input.dataset.listenerAdded) {
-            input.addEventListener('change', (e) => {
-                const foodId = parseInt(e.target.dataset.id);
-                let newQuantity = parseInt(e.target.value);
+    // 2. Xử lý sự kiện CHANGE cho Input Số lượng (qty-input)
+    // Dùng Event Delegation và đảm bảo chỉ thêm listener CHANGE một lần duy nhất
+    if (!cartItemsListEl.dataset.changeListenerAdded) {
+        cartItemsListEl.addEventListener('change', (e) => {
+            const target = e.target;
+            // Kiểm tra xem phần tử bị thay đổi có phải là input số lượng không
+            if (target.classList.contains('qty-input')) {
+                const foodId = parseInt(target.dataset.id);
+                let newQuantity = parseInt(target.value);
 
+                if (isNaN(foodId)) return;
+
+                // Kiểm tra và đảm bảo số lượng >= 1
                 if (isNaN(newQuantity) || newQuantity < 1) {
                     newQuantity = 1;
                 }
 
+                // Cập nhật giỏ hàng
                 updateItemQuantity(foodId, newQuantity);
+                // Render lại để đồng bộ giao diện và cập nhật tổng tiền
                 renderCart();
-            });
-            input.dataset.listenerAdded = true;
-        }
-    });
+
+                // Cập nhật lại giá trị trên input (đề phòng người dùng nhập 0 hoặc giá trị không hợp lệ)
+                // Cần làm điều này sau khi renderCart() đã hoàn tất
+                const currentItemInput = cartItemsListEl.querySelector(`.qty-input[data-id="${foodId}"]`);
+                if (currentItemInput) {
+                    currentItemInput.value = newQuantity;
+                }
+            }
+        });
+        // Đánh dấu đã thêm listener CHANGE
+        cartItemsListEl.dataset.changeListenerAdded = true;
+    }
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     renderCart();
+    // Lắng nghe sự kiện tùy chỉnh 'cartUpdated' để render lại giỏ hàng khi có thay đổi từ nơi khác
     document.addEventListener('cartUpdated', renderCart);
 });

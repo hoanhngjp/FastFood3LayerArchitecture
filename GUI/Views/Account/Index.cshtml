@@ -69,9 +69,9 @@
                         </li>
 
                         <li class="nav-item mt-3 px-3">
-                            <a href="/Home/Logout" class="btn btn-outline-danger w-100">
+                            <button type="button" class="btn btn-outline-danger w-100" id="account-logout-btn">
                                 <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
-                            </a>
+                            </button>
                         </li>
                     </ul>
                 </div>
@@ -274,13 +274,8 @@
         </div>
     </div>
 </div>
+</div>
 
-@section Scripts {
-    <script type="module" src="/js/services/apiService.js"></script>
-    <script type="module" src="/js/services/addressService.js"></script>
-    <script type="module" src="/js/services/orderService.js"></script>
-    <script type="module" src="/js/services/authService.js"></script>
-    <script type="module" src="/js/profileManager.js"></script>
-    <script type="module" src="/js/addressManager.js"></script>
-    <script type="module" src="/js/dashboardManager.js"></script>
-}
+<script type="module" src="/js/services/addressService.js"></script>
+<script type="module" src="/js/addressManager.js"></script>
+<script type="module" src="/js/authChecker.js"></script>

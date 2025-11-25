@@ -1,6 +1,6 @@
 ﻿// /js/services/productDetail.js
 import { getFoodDetail } from './foodService.js';
-import { addItemToCart, formatCurrency } from './cartService.js';
+import { addToCart, formatCurrency } from './cartService.js'; // Đã đổi tên import thành 'addToCart'
 
 // 2. Định nghĩa các DOM elements
 const productTitleEl = document.getElementById('product-title');
@@ -40,6 +40,7 @@ const renderRatingStars = (rating) => {
 
     let starsHTML = '';
     const fullStars = Math.floor(rate);
+    // Điều chỉnh logic cho nửa sao, ví dụ: 0.25 <= phân số <= 0.75
     const hasHalfStar = rate % 1 >= 0.25 && rate % 1 <= 0.75;
 
     for (let i = 0; i < fullStars; i++) {
@@ -180,28 +181,41 @@ function setupQuantityControls() {
 
 /**
  * Thiết lập chức năng Thêm vào Giỏ hàng
+ * Đã sửa để gọi hàm addToCart (theo cartService.js)
  */
 function setupAddToCartHandler() {
     if (!addToCartBtn) return;
 
     addToCartBtn.addEventListener('click', () => {
         if (!currentFoodDetail) {
-            // ... (xử lý lỗi)
+            console.error('Chi tiết món ăn chưa được tải.');
+            alert('Vui lòng chờ tải dữ liệu món ăn.');
             return;
         }
 
-        const quantity = parseInt(qtyInputEl.value) || 1;
+        // Lấy số lượng và đảm bảo là số nguyên dương hợp lệ
+        const quantity = Math.max(1, parseInt(qtyInputEl.value) || 1);
+        qtyInputEl.value = quantity; // Cập nhật lại input nếu cần
 
         try {
+            // Chuẩn bị đối tượng món ăn theo định dạng của giỏ hàng
+            const itemToAdd = {
+                id: currentFoodDetail.foodId, // Sử dụng foodId từ API
+                name: currentFoodDetail.foodName,
+                price: currentFoodDetail.price,
+                quantity: quantity,
+                imageUrl: currentFoodDetail.imgUrl,
+                category: currentFoodDetail.categoryName,
+            };
+
             // Gọi hàm từ Cart Service để thêm món ăn vào Local Storage
-            addItemToCart(currentFoodDetail, quantity);
+            addToCart(itemToAdd); // Đã đổi tên hàm
 
-            // BỎ alert() và thay bằng thông báo nhỏ (ví dụ Toast/Snackbar) nếu bạn muốn,
-            // hoặc chỉ cần cập nhật giỏ hàng ở header.
-            console.log(`Đã thêm thành công ${quantity} x ${currentFoodDetail.foodName} vào giỏ hàng.`);
+            console.log(`Đã thêm thành công ${quantity} x ${currentFoodDetail.foodName} (ID: ${itemToAdd.id}) vào giỏ hàng.`);
 
-            // Tùy chọn: Reset số lượng về 1 sau khi thêm thành công
+            // Cập nhật giao diện: Tùy chọn: Reset số lượng về 1 sau khi thêm thành công
             qtyInputEl.value = 1;
+            // Tùy chọn: Hiển thị thông báo Toast/Snackbar cho người dùng.
 
         } catch (error) {
             console.error('Lỗi khi thêm vào giỏ hàng:', error);
