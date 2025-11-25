@@ -6,6 +6,7 @@ using BUS.Services.RestaurantService;
 using DAT;
 using DAT.Repository;
 using DAT.UnitOfWork;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -13,6 +14,16 @@ using System;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load();
+
+builder.Configuration["ConnectionStrings:DefaultConnection"] = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+builder.Configuration["Jwt:Key"] = Environment.GetEnvironmentVariable("JWT_SECRET");
+
+builder.Configuration["Vnpay:TmnCode"] = Environment.GetEnvironmentVariable("VNPAY_TMNCODE");
+builder.Configuration["Vnpay:HashSecret"] = Environment.GetEnvironmentVariable("VNPAY_HASHSECRET");
+builder.Configuration["Vnpay:BaseUrl"] = Environment.GetEnvironmentVariable("VNPAY_URL");
+
 var config = builder.Configuration;
 
 // Add services to the container.
