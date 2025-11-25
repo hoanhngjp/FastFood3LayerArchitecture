@@ -1,25 +1,29 @@
 ﻿@{
     Layout = "_Layout";
-    ViewData["Title"] = "Chi tiết sản phẩm | Fried Chicken Unlimited";
+    ViewData["Title"] = "Chi tiết sản phẩm";
 }
 
 <style>
     /* Màu cam đậm cho tiêu đề chính */
-    .text-dark-orange {
-        color: #FF8800 !important;
-    }
+    .text-dark-orange { color: #FF8800 !important; }
+
     /* Ghi đè màu đỏ cho icon rating để dùng màu cam/vàng */
-    .rating-wrapper i.bi-star-fill {
-        color: #FFC107; /* Màu vàng cam của Bootstrap Warning */
-    }
+    .rating-wrapper i.bi-star-fill { color: #FFC107; }
+
     /* Giá cũ dùng màu xám */
-    .price-old {
-        color: #6c757d; /* Màu xám */
-    }
+    .price-old { color: #6c757d; }
+
     /* Các nút và badge sẽ dùng màu warning/cam */
     .badge-discount {
         background-color: #FF8800 !important;
         color: white;
+        position: absolute;
+        top: 0;
+        right: 0;
+        transform: translate(25%, -25%);
+        font-size: 0.9rem;
+        padding: 0.5em 0.8em;
+        z-index: 10;
     }
 
     /* === ĐIỀU CHỈNH KÍCH THƯỚC VÀ KHUNG ẢNH === */
@@ -32,11 +36,10 @@
         justify-content: center;
         align-items: center;
         padding: 15px;
-        /* Giảm giới hạn kích thước tối đa (Ảnh nhỏ hơn) */
         max-width: 350px;
         height: auto;
         aspect-ratio: 1 / 1;
-        margin: 0 auto; /* Căn giữa khung ảnh trong cột */
+        margin: 0 auto;
     }
 
     .product-main-image {
@@ -45,27 +48,13 @@
         object-fit: contain;
     }
 
-    .badge-discount {
-        position: absolute;
-        top: 0;
-        right: 0;
-        transform: translate(25%, -25%);
-        font-size: 0.9rem;
-        padding: 0.5em 0.8em;
-        z-index: 10;
-    }
-
-    /* Ẩn các nút mũi tên cho input number (như yêu cầu trước) */
+    /* Ẩn mũi tên input number */
     .qty-input::-webkit-outer-spin-button,
     .qty-input::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
-
-    .qty-input[type=number] {
-        -moz-appearance: textfield;
-    }
-
+    .qty-input[type=number] { -moz-appearance: textfield; }
 </style>
 
 <div class="container my-5">
@@ -87,35 +76,31 @@
 
         <div class="col-lg-5">
             <div class="product-image-area">
-                <img src="/images/food-menu-default.png" id="product-image" alt="Hình ảnh món ăn" class="product-main-image">
-
-                <span class="badge badge-discount" id="discount-badge">
-                    -15%
-                </span>
+                <img src="/images/food-menu-default.png" id="product-image" alt="Món ăn" class="product-main-image">
+                
+                <span class="badge badge-discount" id="discount-badge" style="display: none;"></span>
             </div>
         </div>
 
         <div class="col-lg-7 product-info-area">
 
-            <p class="text-muted text-uppercase fw-bold mb-1" id="product-category">Chicken</p>
+            <p class="text-muted text-uppercase fw-bold mb-1" id="product-category"></p>
 
-            <h1 class="h2 section-title product-title fw-bold text-dark-orange" id="product-title">Fried Chicken Unlimited</h1>
+            <h1 class="h2 section-title product-title fw-bold text-dark-orange" id="product-title"></h1>
 
             <div class="rating-wrapper detail-rating mb-3 fs-5" id="product-rating">
-                <span class="text-muted ms-2 fs-6" id="review-count">(150 Đánh giá)</span>
-            </div>
+                </div>
+            <span class="text-muted ms-2 fs-6" id="review-count"></span>
 
             <div class="price-wrapper detail-price mb-4">
-                <data class="price-current fw-bolder text-danger fs-1" id="price-current" value="49.00">$49.00</data>
+                <data class="price-current fw-bolder text-danger fs-1" id="price-current"></data>
+                
+                <del class="price-old text-muted ms-3 fs-4" id="price-old" style="display: none;"></del>
 
-                <del class="price-old text-muted ms-3 fs-4" id="price-old">$69.00</del>
-
-                <p class="price-text mt-2 text-dark-orange fw-bold" id="price-saved">Tiết kiệm ngay: $20.00</p>
+                <p class="price-text mt-2 text-dark-orange fw-bold" id="price-saved"></p>
             </div>
 
-            <p class="product-description text-secondary mb-4" id="product-description">
-                Gà rán giòn rụm với công thức ướp đặc biệt, chiên ngập dầu cho lớp vỏ ngoài vàng óng. Phù hợp cho bữa ăn gia đình hoặc tiệc tùng.
-            </p>
+            <p class="product-description text-secondary mb-4" id="product-description"></p>
 
             <p class="availability fs-5">Tình trạng: <strong class="text-success">Còn hàng</strong></p>
 
@@ -128,7 +113,7 @@
                     <button class="btn btn-outline-warning qty-btn" type="button" id="button-addon2">+</button>
                 </div>
 
-                <button class="btn btn-warning btn-lg add-to-cart-btn text-dark fw-bold flex-grow-1" style="max-width: 300px;">
+                <button id="add-to-cart-btn" class="btn btn-warning btn-lg add-to-cart-btn text-dark fw-bold flex-grow-1" style="max-width: 300px;">
                     <i class="bi bi-cart-plus me-2"></i> Thêm vào giỏ hàng
                 </button>
             </div>
@@ -140,18 +125,21 @@
             </a>
 
         </div>
-
     </div>
-
 </div>
 
-@* 🌟 KHỐI SCRIPT QUAN TRỌNG: LẤY ID VÀ LIÊN KẾT JS 🌟 *@
 <script>
-    // Lấy ID món ăn từ route data của Razor
-    // Đây là ID món ăn hiện tại để gọi API
-    window.foodId = @ViewContext.RouteData.Values["id"];
+    @{
+        // Logic lấy ID giữ nguyên
+        var foodIdFromQuery = Context.Request.Query["foodId"];
+        var foodIdFromRoute = ViewContext.RouteData.Values["id"];
+        var finalFoodId = !string.IsNullOrEmpty(foodIdFromQuery) ? foodIdFromQuery : foodIdFromRoute;
+    }
+    window.foodId = '@(finalFoodId)';
 </script>
 
-@* Đảm bảo foodService.js và productDetail.js được tải *@
-<script type="module" src="/js/foodService.js"></script>
-<script type="module" src="/js/productDetail.js"></script>
+@section Scripts {
+    <script type="module" src="/js/services/foodService.js"></script>
+    <script type="module" src="/js/services/productDetail.js"></script>
+    <script type="module" src="/js/services/cartService.js"></script>
+}

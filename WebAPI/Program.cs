@@ -26,9 +26,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
         policy => policy
-            .AllowAnyOrigin()
+            .WithOrigins("https://localhost:7105")//New
             .AllowAnyMethod()
-            .AllowAnyHeader());
+            .AllowAnyHeader()
+            .AllowCredentials());//New
+
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -102,6 +104,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseHsts();//New
 
 app.UseStaticFiles();//New
 
