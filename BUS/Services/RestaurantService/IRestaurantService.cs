@@ -1,4 +1,5 @@
 ﻿using DTO.DTO;
+using DTO.DTO.Restaurant;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,7 @@ namespace BUS.Services.RestaurantService
     {
         Task<IEnumerable<RestaurantDTO>> GetAllAsync();
         Task<RestaurantDTO?> GetByIdAsync(int id);
-
-        // (Tạm thời chúng ta chưa cần Add/Update/Delete nhà hàng, 
-        // vì đó là việc của Admin, làm sau)
+        Task<RestaurantResult> UpdateRestaurantInfoAsync(RestaurantUpdateDTO dto, int managerRestaurantId);
+        Task<RestaurantResult> ToggleRestaurantStatusAsync(bool isOpen, int managerRestaurantId);
     }
 }

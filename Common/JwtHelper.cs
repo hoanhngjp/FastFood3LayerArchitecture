@@ -17,12 +17,10 @@ namespace Common
 
             var claims = new[]
             {
+                new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
                 new Claim("sub", user.UserID.ToString()),
                 new Claim("email", user.Email),
-                
-                // --- THAY ĐỔI Ở ĐÂY ---
-                // CŨ: new Claim(ClaimTypes.Role, user.Role) 
-                new Claim(ClaimTypes.Role, user.UserRole.RoleName) // MỚI
+                new Claim(ClaimTypes.Role, user.UserRole.RoleName)
             };
 
             var token = new JwtSecurityToken(
