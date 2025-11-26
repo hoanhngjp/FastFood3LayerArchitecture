@@ -21,6 +21,12 @@ namespace DAT.Entity
         [StringLength(500)]
         public string AdrsLine { get; set; }
 
+        [Column(TypeName = "decimal(9, 6)")]
+        public decimal Latitude { get; set; } // Vĩ độ
+
+        [Column(TypeName = "decimal(9, 6)")]
+        public decimal Longitude { get; set; } // Kinh độ
+
         [Required]
         [StringLength(20)]
         public string Phone { get; set; }

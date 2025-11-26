@@ -2,6 +2,7 @@
 using BUS.Services.AddressService;
 using BUS.Services.CartService;
 using BUS.Services.DashboardService;
+using BUS.Services.DroneService;
 using BUS.Services.PaymentService;
 using BUS.Services.RestaurantService;
 using DAT;
@@ -13,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
+using WebAPI.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +35,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Đăng ký Hosted Service
+builder.Services.AddHostedService<DroneSimulatorWorker>();
 
 // CORS policy
 builder.Services.AddCors(options =>
@@ -71,7 +76,8 @@ builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
-builder.Services.AddScoped<ICartService, CartService>(); 
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IDroneService, DroneService>();
 
 builder.Services.AddHttpContextAccessor();
 // Thêm dịch vụ "Xác thực"
