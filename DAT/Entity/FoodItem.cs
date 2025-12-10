@@ -25,7 +25,6 @@ namespace DAT.Entity
 
         [StringLength(512)]
         public string? ImageURL { get; set; }
-
         [StringLength(1000)]
         public string? Description { get; set; }
 

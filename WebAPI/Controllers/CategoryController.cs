@@ -1,5 +1,6 @@
 ﻿using BUS.Services;
 using DTO.DTO;
+using DTO.DTO.Category;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -28,7 +29,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] CategoryDTO dto)
+        public async Task<IActionResult> Add([FromBody] CreateCategoryDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -40,7 +41,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CategoryDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDTO dto)
         {
             if (id != dto.CategoryId)
                 return BadRequest(new { message = "ID trong URL không khớp với ID trong body" });

@@ -9,6 +9,7 @@ namespace DTO.DTO
     public class RestaurantDTO
     {
         public int RestaurantID { get; set; }
+        public int ManagerID { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
         public string PhoneNumber { get; set; }

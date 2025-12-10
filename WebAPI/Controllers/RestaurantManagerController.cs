@@ -1,13 +1,13 @@
 ﻿using BUS.Services;
 using BUS.Services.DashboardService;
-
+using BUS.Services.DroneService;
 using BUS.Services.RestaurantService;
 
 // using BUS.Services.DashboardService; (Đã nằm trong BUS.Services namespace chung)
-// using BUS.Services.RestaurantService;
 using DAT.Entity;
 using DAT.UnitOfWork;
-using DTO.DTO; // Dùng chung namespace DTO
+using DTO.DTO;
+using DTO.DTO.Drone;
 using DTO.DTO.Restaurant;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,24 +16,27 @@ using System.Security.Claims;
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("api/manager")] // SỬA: Thêm prefix api/ cho chuẩn
+    [Route("manager")] // SỬA: Thêm prefix api/ cho chuẩn
     [Authorize(Roles = "manager")] // SỬA: Role chữ thường đồng bộ với database
     public class RestaurantManagerController : ControllerBase
     {
-        private readonly IDashboardService _dashboardService;
+        private readonly IRestaurantDashboardService _dashboardService;
         private readonly IOrderService _orderService;
         private readonly IRestaurantService _restaurantService;
+        private readonly IDroneService _droneService;
         private readonly IUnitOfWork _uow;
 
         public RestaurantManagerController(
-            IDashboardService dashboardService,
+            IRestaurantDashboardService dashboardService,
             IOrderService orderService,
             IRestaurantService restaurantService,
+            IDroneService droneService,
             IUnitOfWork uow)
         {
             _dashboardService = dashboardService;
             _orderService = orderService;
             _restaurantService = restaurantService;
+            _droneService = droneService;
             _uow = uow;
         }
 
@@ -104,19 +107,20 @@ namespace WebAPI.Controllers
 
         // 2. Dashboard
         [HttpGet("dashboard/statistics")]
-        public async Task<IActionResult> GetDashboardStatistics([FromQuery] int restaurantId)
+        public async Task<IActionResult> GetDashboardStatistics([FromQuery] int restaurantId, [FromQuery] string filter = "today", [FromQuery] DateTime? from = null, [FromQuery] DateTime? to = null)
         {
             var managerId = GetManagerUserIdFromToken();
             var (isOwner, error) = await CheckOwnershipAsync(managerId, restaurantId);
             if (!isOwner) return error;
 
-            var stats = await _dashboardService.GetTodayStatisticsAsync(restaurantId);
+            // Gọi Service với đầy đủ tham số
+            var stats = await _dashboardService.GetDashboardStatisticsAsync(restaurantId, filter, from, to);
             return Ok(stats);
         }
 
         // 3. Quản lý Đơn hàng
         [HttpGet("orders")]
-        public async Task<IActionResult> GetOrders([FromQuery] int restaurantId, [FromQuery] string status = "Pending")
+        public async Task<IActionResult> GetOrders([FromQuery] int restaurantId, [FromQuery] string status = "All")
         {
             var managerId = GetManagerUserIdFromToken();
             var (isOwner, error) = await CheckOwnershipAsync(managerId, restaurantId);
@@ -176,6 +180,46 @@ namespace WebAPI.Controllers
             // Bạn cần đảm bảo Service đã có hàm này
             var success = await _restaurantService.ToggleRestaurantStatusAsync(isOpen, restaurantId);
             return HandleResult(success==RestaurantResult.Success, $"Đã chuyển trạng thái thành {(isOpen ? "Mở" : "Đóng")}.", "Thất bại.");
+        }
+        // --- BỔ SUNG: QUẢN LÝ DRONE (Dành cho Manager) ---
+
+        // 6. Lấy danh sách Drone đang rảnh
+        [HttpGet("drones/available")]
+        public async Task<IActionResult> GetAvailableDrones()
+        {
+            var allDrones = await _droneService.GetAllAsync();
+            // Lọc các drone có trạng thái "Idle" (Rảnh)
+            var availableDrones = allDrones.Where(d => d.StatusName == "Idle");
+            return Ok(availableDrones);
+        }
+
+        // 7. Gán Drone giao hàng (Confirmed -> Delivering)
+        [HttpPost("orders/assign-drone")]
+        public async Task<IActionResult> AssignDroneToOrder([FromBody] AssignDroneDTO dto)
+        {
+            // Kiểm tra quyền sở hữu đơn hàng (Manager chỉ được gán drone cho đơn của quán mình)
+            var managerId = GetManagerUserIdFromToken();
+
+            // Lấy thông tin Order để check RestaurantID -> Check ManagerID
+            var order = await _uow.Orders.GetByIdWithDetailsAsync(dto.OrderId);
+            if (order == null) return NotFound(new { message = "Không tìm thấy đơn hàng." });
+
+            if (order.Restaurant == null || order.Restaurant.ManagerID != managerId)
+            {
+                return Forbid(); // Không có quyền thao tác đơn của quán khác
+            }
+
+            // Gọi Service thực hiện logic nghiệp vụ
+            var result = await _droneService.AssignOrderAsync(dto);
+
+            if (result == "Success")
+            {
+                return Ok(new { message = "Đã gán Drone và bắt đầu giao hàng." });
+            }
+            else
+            {
+                return BadRequest(new { message = result });
+            }
         }
     }
 }

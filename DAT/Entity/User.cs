@@ -35,8 +35,8 @@ namespace DAT.Entity
         [StringLength(256)]
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiry { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         [ForeignKey("RoleID")]
         public virtual UserRole UserRole { get; set; }

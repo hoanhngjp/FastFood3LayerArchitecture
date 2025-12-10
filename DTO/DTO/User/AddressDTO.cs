@@ -24,5 +24,7 @@ namespace DTO.DTO
         public string Phone { get; set; }
 
         public bool IsDefault { get; set; }
+        public decimal? Latitude { get; set; } // Có thể null nếu chưa geocode
+        public decimal? Longitude { get; set; } // Có thể null nếu chưa geocode
     }
 }

@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Thực đơn";
+    Layout = "~/Views/Shared/_LayoutManager.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Thực đơn nhà hàng</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                    <input type="text" id="input-search" class="form-control" placeholder="Tìm tên món ăn...">
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <select class="form-select" id="select-category">
+                    <option value="" selected>-- Tất cả danh mục --</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <select class="form-select" id="select-page-size">
+                    <option value="5">Hiển thị 5</option>
+                    <option value="10" selected>Hiển thị 10</option>
+                    <option value="20">Hiển thị 20</option>
+                    <option value="50">Hiển thị 50</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4" style="width: 50px;">#</th>
+                        <th style="width: 100px;">Hình ảnh</th>
+                        <th>Tên món</th>
+                        <th>Giá bán</th>
+                        <th>Mô tả</th>
+                        <th class="text-center">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody id="menu-table-body">
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <div class="mt-2 text-muted">Đang tải dữ liệu...</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top bg-light" id="pagination-area" style="display:none;">
+            <div class="text-muted small" id="pagination-info">
+            </div>
+            <nav>
+                <ul class="pagination pagination-sm mb-0 justify-content-end" id="pagination-controls">
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="module" src="~/js/manager/pages/menu.js"></script>
+}

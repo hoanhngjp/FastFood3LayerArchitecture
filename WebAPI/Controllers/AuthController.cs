@@ -43,9 +43,9 @@ namespace WebAPI.Controllers
                 var accessCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true,
+                    Secure = false,
                     Expires = res.ExpiresAt, // Hết hạn theo vé
-                    SameSite = SameSiteMode.Strict
+                    SameSite = SameSiteMode.Lax
                 };
                 Response.Cookies.Append("access_token", res.Token, accessCookieOptions);
 
@@ -53,9 +53,9 @@ namespace WebAPI.Controllers
                 var refreshCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true,
+                    Secure = false,
                     Expires = DateTime.UtcNow.AddDays(7), // Hết hạn 7 ngày
-                    SameSite = SameSiteMode.Strict,
+                    SameSite = SameSiteMode.Lax,
                     Path = "/auth" // Chỉ gửi cookie này khi gọi /auth
                 };
                 Response.Cookies.Append("refresh_token", res.RefreshToken, refreshCookieOptions);
@@ -126,9 +126,9 @@ namespace WebAPI.Controllers
                 var accessCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true,
+                    Secure = false,
                     Expires = res.ExpiresAt,
-                    SameSite = SameSiteMode.Strict
+                    SameSite = SameSiteMode.Lax
                 };
                 Response.Cookies.Append("access_token", res.Token, accessCookieOptions);
 

@@ -1,5 +1,6 @@
 ﻿using BUS.Services;
 using DTO.DTO;
+using DTO.DTO.FoodItem;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -51,7 +52,7 @@ namespace WebAPI.Controllers
 
         // SỬA: POST /foods
         [HttpPost] // Bỏ "createFood"
-        public async Task<IActionResult> CreateFood([FromBody] FoodItemDTO dto)
+        public async Task<IActionResult> CreateFood([FromBody] CreateFoodItemDTO dto)
         {
             // CẢI TIẾN: Kiểm tra ModelState để validate DTO tự động (nếu có [Required], [StringLength]...)
             if (!ModelState.IsValid)
@@ -59,15 +60,15 @@ namespace WebAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            await _service.AddAsync(dto);
+            var newFood = await _service.AddAsync(dto);
 
             // CẢI TIẾN: Trả về 201 Created thay vì 200 OK. Đây là chuẩn REST cho việc tạo mới.
             // CreatedAtAction sẽ tạo một URL trỏ đến resource vừa tạo trong header "Location".
-            return CreatedAtAction(nameof(GetFoodById), new { id = dto.FoodId }, dto);
+            return CreatedAtAction(nameof(GetFoodById), new { id = newFood.FoodId }, newFood);
         }
 
         [HttpPut("{id}")] // Bỏ "updateFood/"
-        public async Task<IActionResult> UpdateFood(int id, [FromBody] FoodItemDTO dto)
+        public async Task<IActionResult> UpdateFood(int id, [FromBody] UpdateFoodItemDTO dto)
         {
             // Kiểm tra ID khớp, bạn làm rất tốt!
             if (id != dto.FoodId)
@@ -78,7 +79,7 @@ namespace WebAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = await _service.UpdateAsync(dto);
+            var result = await _service.UpdateAsync(id, dto);
 
             // Nếu service trả về false (không tìm thấy) -> Trả về 404 Not Found.
             if (!result)

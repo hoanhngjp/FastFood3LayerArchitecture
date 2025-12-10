@@ -1,4 +1,5 @@
-﻿using BUS.Services.AddressService;
+﻿using BUS.Services;
+using BUS.Services.AddressService;
 using DTO.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +13,12 @@ namespace WebAPI.Controllers
     public class MeController : ControllerBase
     {
         private readonly IAddressService _addressService;
+        private readonly IOrderService _orderService; // [1] Inject thêm OrderService
 
-        // (Sau này bạn có thể inject thêm IProfileService, IOrderHistoryService...)
-
-        public MeController(IAddressService addressService)
+        public MeController(IAddressService addressService, IOrderService orderService)
         {
             _addressService = addressService;
+            _orderService = orderService;
         }
 
         // Helper: Lấy UserID từ token một cách an toàn
@@ -84,6 +85,15 @@ namespace WebAPI.Controllers
             }
 
             return NoContent(); // Trả về 204
+        }
+
+        // GET: /me/orders
+        [HttpGet("orders")]
+        public async Task<IActionResult> GetMyOrderHistory()
+        {
+            // Lấy danh sách đơn hàng của chính user đang đăng nhập
+            var orders = await _orderService.GetMyOrdersAsync(UserIdFromToken);
+            return Ok(orders);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DAT.UnitOfWork;
 using DTO.DTO;
+using DTO.DTO.Category;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace BUS.Services
             return MapToDTO(c);
         }
 
-        public async Task<CategoryDTO> AddAsync(CategoryDTO dto)
+        public async Task<CategoryDTO> AddAsync(CreateCategoryDTO dto)
         {
             var entity = new DAT.Entity.Category
             {
@@ -47,7 +48,7 @@ namespace BUS.Services
             return MapToDTO(entity);
         }
 
-        public async Task<bool> UpdateAsync(int id, CategoryDTO dto)
+        public async Task<bool> UpdateAsync(int id, UpdateCategoryDTO dto)
         {
             var entity = await _unitOfWork.Categories.GetByIdAsync(id);
 

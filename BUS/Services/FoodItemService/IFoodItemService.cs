@@ -1,4 +1,5 @@
 ﻿using DTO.DTO;
+using DTO.DTO.FoodItem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,11 @@ namespace BUS.Services
 {
     public interface IFoodItemService
     {
-        Task<IEnumerable<FoodItemDTO>> GetAllAsync();
-        Task<IEnumerable<FoodItemDTO>> GetFoodsByCategoryAsync(int categoryId);
-        Task<FoodItemDTO?> GetByIdAsync(int id);
-        Task AddAsync(FoodItemDTO dto);
-        Task<bool> UpdateAsync(FoodItemDTO dto);
+        Task<IEnumerable<FoodItemResponseDTO>> GetAllAsync();
+        Task<IEnumerable<FoodItemResponseDTO>> GetFoodsByCategoryAsync(int categoryId);
+        Task<FoodItemResponseDTO?> GetByIdAsync(int id);
+        Task<FoodItemResponseDTO> AddAsync(CreateFoodItemDTO dto);
+        Task<bool> UpdateAsync(int id, UpdateFoodItemDTO dto);
         Task<bool> DeleteAsync(int id);
     }
 

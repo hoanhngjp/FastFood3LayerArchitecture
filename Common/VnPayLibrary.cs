@@ -13,8 +13,8 @@ namespace Common
 {
     public class VnPayLibrary
     {
-        private readonly SortedList<string, string> _requestData = new SortedList<string, string>(new VnPayCompare());
-        private readonly SortedList<string, string> _responseData = new SortedList<string, string>(new VnPayCompare());
+        private readonly SortedList<string, string> _requestData = new SortedList<string, string>(StringComparer.Ordinal);
+        private readonly SortedList<string, string> _responseData = new SortedList<string, string>(StringComparer.Ordinal);
 
         public void AddRequestData(string key, string value)
         {
@@ -40,8 +40,14 @@ namespace Common
         public string CreateRequestUrl(string baseUrl, string vnpHashSecret)
         {
             var data = new StringBuilder();
-            foreach (var (key, value) in _requestData.Where(kv => !string.IsNullOrEmpty(kv.Value)))
+
+            // Dùng StringComparer.Ordinal để đảm bảo thứ tự sắp xếp chuẩn ASCII
+            // (Bỏ VnPayCompare cũ đi để tránh rủi ro logic so sánh sai)
+            var sortedData = new SortedList<string, string>(_requestData, StringComparer.Ordinal);
+
+            foreach (var (key, value) in sortedData.Where(kv => !string.IsNullOrEmpty(kv.Value)))
             {
+                // Dùng Uri.EscapeDataString theo chuẩn mới
                 data.Append(WebUtility.UrlEncode(key) + "=" + WebUtility.UrlEncode(value) + "&");
             }
 
@@ -54,19 +60,35 @@ namespace Common
                 signData = signData.Remove(querystring.Length - 1, 1);
             }
 
+            // --- ĐOẠN LOG DEBUG QUAN TRỌNG ---
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("================ VNPAY DEBUG ================");
+            Console.WriteLine("1. RAW DATA (Chuỗi dùng để Hash):");
+            Console.WriteLine(signData);
+            Console.WriteLine("---------------------------------------------");
+            // Bạn hãy copy chuỗi signData in ra ở trên, 
+            // Vào trang: https://www.freeformatter.com/hmac-generator.html
+            // Dán vào ô Input, chọn SHA512, điền SecretKey -> So sánh kết quả Hash
+
             var vnpSecureHash = HmacSha512(vnpHashSecret, signData);
+
+            Console.WriteLine("2. HASH TÍNH ĐƯỢC (Trong Code):");
+            Console.WriteLine(vnpSecureHash);
+            Console.WriteLine("=============================================");
+            Console.ResetColor();
+            // ---------------------------------
+
             baseUrl += "vnp_SecureHash=" + vnpSecureHash;
 
             return baseUrl;
         }
-    
         public bool ValidateSignature(string inputHash, string secretKey)
         {
-            var rspRaw = GetResponseDataForHash(); // Dùng hàm hash "xịn"
+            var rspRaw = GetResponseDataForHash();
             var myChecksum = HmacSha512(secretKey, rspRaw);
             return myChecksum.Equals(inputHash, StringComparison.InvariantCultureIgnoreCase);
         }
-        
+
         private string HmacSha512(string key, string inputData)
         {
             var hash = new StringBuilder();
@@ -82,7 +104,7 @@ namespace Common
             }
             return hash.ToString();
         }
-        
+
         public string GetIpAddress(HttpContext context)
         {
             var ipAddress = string.Empty;
@@ -117,6 +139,7 @@ namespace Common
             }
             foreach (var (key, value) in _responseData.Where(kv => !string.IsNullOrEmpty(kv.Value)))
             {
+                // THAY ĐỔI QUAN TRỌNG: Dùng Uri.EscapeDataString
                 data.Append(WebUtility.UrlEncode(key) + "=" + WebUtility.UrlEncode(value) + "&");
             }
             if (data.Length > 0)

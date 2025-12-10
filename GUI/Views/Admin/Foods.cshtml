@@ -1,0 +1,111 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Món ăn";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex gap-2">
+        <div class="input-group" style="width: 250px;">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+            <input type="text" id="searchKeyword" class="form-control border-start-0 ps-0" placeholder="Tìm tên món...">
+        </div>
+
+        <select id="filterCategory" class="form-select" style="width: 200px;">
+            <option value="">-- Đang tải danh mục --</option>
+        </select>
+
+        <select id="pageSizeSelect" class="form-select" style="width: 140px;">
+            <option value="5">Hiển thị 5</option>
+            <option value="10" selected>Hiển thị 10</option>
+            <option value="20">Hiển thị 20</option>
+            <option value="50">Hiển thị 50</option>
+        </select>
+    </div>
+
+    <button class="btn btn-primary shadow-sm" onclick="openFoodModal()">
+        <i class="bi bi-plus-lg"></i> Thêm món
+    </button>
+</div>
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4">Món ăn</th>
+                    <th>Giá bán</th>
+                    <th>Danh mục</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end pe-4">Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="foodTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+        <span class="text-muted small" id="pagingInfo">Đang tải dữ liệu...</span>
+        <nav>
+            <ul class="pagination pagination-sm mb-0 justify-content-end" id="paginationControls">
+            </ul>
+        </nav>
+    </div>
+</div>
+<div class="modal fade" id="foodModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="foodModalTitle">Thêm món ăn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="foodForm">
+                    <input type="hidden" id="foodId">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tên món <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="foodName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Danh mục <span class="text-danger">*</span></label>
+                            <select class="form-select" id="foodCategory" required></select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Giá (VNĐ) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="foodPrice" min="0" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select" id="foodStatus">
+                                <option value="1">Đang bán</option>
+                                <option value="0">Hết hàng</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="foodDesc" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hình ảnh</label>
+                        <input type="file" class="form-control" id="foodImageFile" accept="image/*">
+                        <input type="hidden" id="foodImgUrl">
+                        <div class="mt-2 text-center p-2 border rounded bg-light">
+                            <img id="foodPreviewImg" src="" style="max-height: 120px; display: none; margin: 0 auto;">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveFood()">Lưu thông tin</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module" src="~/js/admin/pages/foodItem.js"></script>
+}

@@ -10,8 +10,11 @@ namespace GUI.Controllers
         {
             return View(); // Trả về View Account.cshtml
         }
-
-        // Action cho các Form Submit (Ví dụ: [HttpPost] Cập nhật Profile)
+        public IActionResult Tracking(int id)
+        {
+            ViewBag.OrderId = id;
+            return View("~/Views/Order/Tracking.cshtml");
+        }
         // ...
     }
 }

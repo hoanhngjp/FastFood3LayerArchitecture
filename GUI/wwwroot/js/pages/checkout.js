@@ -1,123 +1,263 @@
-﻿// File: /js/pages/checkout.js
+﻿import { placeOrder } from '../services/orderService.js';
+import { getCartSummaryForCheckout, formatCurrency } from '../services/cartService.js';
+import { getMyAddresses, addAddress } from '../services/addressService.js';
+import { callApi } from '../services/apiClient.js';
 
-import { createOrderAndProcessPayment } from '../services/orderService.js';
-import { getCartSummaryForCheckout, formatCurrency, getCart } from '../services/cartService.js';
+// DOM Elements
+const checkoutBtn = document.getElementById('complete-checkout-btn');
+const restaurantSelect = document.getElementById('restaurant-select');
+const addressSelect = document.getElementById('address-select');
 
-// --- Helper Functions ---
+// Restaurant Info Elements (MỚI)
+const restInfoArea = document.getElementById('restaurant-info-area');
+const restAddressEl = document.getElementById('rest-address');
+const restPhoneEl = document.getElementById('rest-phone');
+const restTimeEl = document.getElementById('rest-time');
 
-/**
- * Cập nhật Tóm tắt Đơn hàng (Summary Card) trên giao diện.
- */
-function updateSummaryCard() {
-    const { cartItems, subtotal, totalAmount, shippingFee } = getCartSummaryForCheckout();
+// Form inputs
+const inputName = document.getElementById('ho-ten');
+const inputPhone = document.getElementById('dien-thoai');
+const inputAddress = document.getElementById('dia-chi');
+const inputNote = document.getElementById('ghi-chu');
 
-    // Cập nhật số món
-    document.querySelector('.checkout-summary-card h4 span.badge').textContent = `${cartItems.length} món`;
+// Dữ liệu tạm
+let myAddresses = [];
+let availableRestaurants = []; // (MỚI) Lưu danh sách nhà hàng để tra cứu
 
-    // Tạo danh sách sản phẩm
-    const ulListGroup = document.querySelector('.checkout-summary-card .list-group-flush:first-of-type');
-    ulListGroup.innerHTML = '';
+// --- 1. LOGIC RENDER UI ---
 
-    if (cartItems.length === 0) {
-        ulListGroup.innerHTML = '<li class="list-group-item bg-light text-muted px-0">Giỏ hàng trống.</li>';
-    } else {
-        cartItems.forEach(item => {
-            const li = document.createElement('li');
-            li.className = 'list-group-item bg-light d-flex justify-content-between align-items-center px-0';
-            li.innerHTML = `
-                <span>${item.quantity}x ${item.name}</span>
-                <span class="fw-bold">${formatCurrency(item.price * item.quantity)}</span>
-            `;
-            ulListGroup.appendChild(li);
-        });
-    }
+function renderSummary() {
+    getCartSummaryForCheckout().then(summary => {
+        const { cartItems, subtotal, totalAmount, shippingFee } = summary;
 
-    // Cập nhật Tạm tính và Tổng thanh toán
-    const summaryItems = document.querySelectorAll('.checkout-summary-card .list-group-flush.border-top li span:nth-child(2)');
-    // [0] Tạm tính
-    summaryItems[0].textContent = formatCurrency(subtotal);
-    // [1] Phí giao hàng
-    summaryItems[1].textContent = shippingFee === 0 ? "Miễn phí" : formatCurrency(shippingFee);
-    // [2] Tổng thanh toán
-    summaryItems[2].textContent = formatCurrency(totalAmount);
+        // Badge số lượng
+        const badge = document.querySelector('.checkout-summary-card .badge');
+        if (badge) badge.textContent = `${cartItems.length} món`;
 
-    return cartItems.length > 0;
+        // List items
+        const listEl = document.getElementById('summary-items-list');
+        if (listEl) {
+            listEl.innerHTML = '';
+
+            if (cartItems.length === 0) {
+                listEl.innerHTML = '<li class="text-muted small">Giỏ hàng trống</li>';
+                if (checkoutBtn) checkoutBtn.disabled = true;
+                return;
+            }
+
+            cartItems.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item bg-light d-flex justify-content-between px-0 py-1';
+                li.innerHTML = `
+                    <div class="small">
+                        <span class="fw-bold">${item.quantity}x</span> ${item.name}
+                    </div>
+                    <span class="small">${formatCurrency(item.price * item.quantity)}</span>
+                `;
+                listEl.appendChild(li);
+            });
+        }
+
+        // Totals
+        const subEl = document.getElementById('summary-subtotal');
+        if (subEl) subEl.textContent = formatCurrency(subtotal);
+
+        const shipEl = document.getElementById('summary-shipping');
+        if (shipEl) shipEl.textContent = shippingFee === 0 ? 'Miễn phí' : formatCurrency(shippingFee);
+
+        const totalEl = document.getElementById('summary-total');
+        if (totalEl) totalEl.textContent = formatCurrency(totalAmount);
+    });
 }
 
-// --- Main Logic ---
+async function loadRestaurants() {
+    try {
+        const data = await callApi('/restaurants', null, 'GET');
 
-document.addEventListener('DOMContentLoaded', function () {
-    const checkoutBtn = document.getElementById('complete-checkout-btn');
-    const vnpayRadio = document.getElementById('vnpay');
-    const codRadio = document.getElementById('tien-mat');
-    const vnpayDetails = document.getElementById('vnpay-details');
+        // (MỚI) Lưu lại dữ liệu để dùng khi user chọn
+        availableRestaurants = Array.isArray(data) ? data : [];
 
-    // 1. Cập nhật Summary Card và kiểm tra giỏ hàng
-    const hasItems = updateSummaryCard();
-    if (!hasItems) {
-        if (checkoutBtn) {
-            checkoutBtn.disabled = true;
-            checkoutBtn.textContent = 'GIỎ HÀNG TRỐNG';
-        }
-    }
+        restaurantSelect.innerHTML = '<option value="" selected disabled>-- Chọn nhà hàng --</option>';
 
+        if (availableRestaurants.length > 0) {
+            availableRestaurants.forEach(r => {
+                const option = document.createElement('option');
+                // Support cả camelCase (json) và PascalCase (C# default)
+                option.value = r.restaurantID || r.RestaurantID;
+                option.textContent = r.name || r.Name || r.restaurantName || r.RestaurantName;
+                restaurantSelect.appendChild(option);
+            });
 
-    // 2. Logic ẩn/hiện chi tiết VNPay
-    function toggleVnPayDetails() {
-        if (vnpayRadio && vnpayRadio.checked) {
-            vnpayDetails.classList.add('show');
-        } else {
-            vnpayDetails.classList.remove('show');
-        }
-    }
-
-    if (codRadio) codRadio.addEventListener('change', toggleVnPayDetails);
-    if (vnpayRadio) vnpayRadio.addEventListener('change', toggleVnPayDetails);
-    toggleVnPayDetails(); // Thiết lập trạng thái ban đầu
-
-    // 3. Xử lý sự kiện nút HOÀN TẤT ĐẶT HÀNG
-    if (checkoutBtn && hasItems) {
-        checkoutBtn.addEventListener('click', async function (e) {
-            e.preventDefault();
-
-            // Validate form
-            const customerForm = document.getElementById('customer-form');
-            if (!customerForm.checkValidity()) {
-                customerForm.reportValidity(); // Hiển thị lỗi HTML5 Validation
-                return;
+            // Nếu chỉ có 1 nhà hàng, chọn luôn và hiển thị thông tin
+            if (availableRestaurants.length === 1) {
+                restaurantSelect.selectedIndex = 1;
+                displayRestaurantInfo(restaurantSelect.value);
             }
+        }
+    } catch (e) {
+        console.error("Lỗi tải nhà hàng:", e);
+        restaurantSelect.innerHTML = '<option disabled>Lỗi tải dữ liệu</option>';
+    }
+}
 
-            // Hiển thị loading
-            checkoutBtn.disabled = true;
-            checkoutBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang xử lý...';
+// (MỚI) Hàm hiển thị thông tin nhà hàng
+function displayRestaurantInfo(restaurantId) {
+    if (!restaurantId || !restInfoArea) return;
 
-            // Gọi API
-            const result = await createOrderAndProcessPayment();
+    // Tìm nhà hàng trong mảng đã load
+    const restaurant = availableRestaurants.find(r =>
+        (r.restaurantID || r.RestaurantID) == restaurantId
+    );
 
-            // Xử lý kết quả
-            if (result.isSuccess && result.redirectUrl) {
-                // Thành công: Redirect đến VNPay hoặc trang Thank You
-                window.location.href = result.redirectUrl;
-                return;
-            } else {
-                // Thất bại: Hiển thị thông báo lỗi
-                alert(`Đặt hàng thất bại: ${result.message}`);
+    if (restaurant) {
+        // Support cả 2 kiểu casing
+        restAddressEl.textContent = restaurant.address || restaurant.Address || 'Chưa cập nhật';
+        restPhoneEl.textContent = restaurant.phoneNumber || restaurant.PhoneNumber || 'Chưa cập nhật';
+        restTimeEl.textContent = restaurant.openingHours || restaurant.OpeningHours || 'Chưa cập nhật';
 
-                // Nếu lỗi do hết hạn Token, có thể chuyển hướng đến trang Login
-                // if (result.message.includes("Bạn chưa đăng nhập")) {
-                //     window.location.href = "/login"; 
-                // }
-            }
+        // Hiện khung thông tin (Bootstrap collapse class 'show')
+        restInfoArea.classList.add('show');
+    } else {
+        restInfoArea.classList.remove('show');
+    }
+}
 
-            // Kết thúc (nếu không có redirect)
-            checkoutBtn.disabled = false;
-            checkoutBtn.innerHTML = '<i class="bi bi-check2-circle me-2"></i> HOÀN TẤT ĐẶT HÀNG';
-            // Cần cập nhật lại giỏ hàng nếu thất bại (dù hàm createOrder đã gọi clearCart(), 
-            // nó chỉ chạy khi response.ok).
-            updateSummaryCard();
+async function loadAddresses() {
+    try {
+        myAddresses = await getMyAddresses() || [];
+
+        addressSelect.innerHTML = '<option value="new">-- Nhập địa chỉ mới --</option>';
+
+        myAddresses.forEach(addr => {
+            const option = document.createElement('option');
+            option.value = addr.adrsID;
+            option.textContent = `${addr.adrsCustomerName} - ${addr.phone}`;
+            addressSelect.appendChild(option);
         });
-    }
 
-    // Lắng nghe sự kiện giỏ hàng được cập nhật từ các trang khác (ví dụ: giỏ hàng trống)
-    document.addEventListener('cartUpdated', updateSummaryCard);
+        const defaultAddr = myAddresses.find(a => a.isDefault);
+        if (defaultAddr) {
+            addressSelect.value = defaultAddr.adrsID;
+            fillAddressForm(defaultAddr);
+        }
+
+    } catch (e) {
+        console.error("Lỗi tải địa chỉ:", e);
+    }
+}
+
+function fillAddressForm(addr) {
+    if (!addr) return;
+    inputName.value = addr.adrsCustomerName || '';
+    inputPhone.value = addr.phone || '';
+    inputAddress.value = addr.adrsLine || '';
+}
+
+function clearAddressForm() {
+    inputName.value = '';
+    inputPhone.value = '';
+    inputAddress.value = '';
+}
+
+// --- 2. EVENT LISTENERS ---
+
+// (MỚI) Khi chọn nhà hàng -> Hiển thị thông tin
+if (restaurantSelect) {
+    restaurantSelect.addEventListener('change', function () {
+        displayRestaurantInfo(this.value);
+    });
+}
+
+// Khi thay đổi dropdown địa chỉ
+if (addressSelect) {
+    addressSelect.addEventListener('change', () => {
+        const val = addressSelect.value;
+        if (val === 'new') {
+            clearAddressForm();
+            inputName.readOnly = false;
+            inputPhone.readOnly = false;
+            inputAddress.readOnly = false;
+        } else {
+            const selectedAddr = myAddresses.find(a => a.adrsID == val);
+            if (selectedAddr) {
+                fillAddressForm(selectedAddr);
+            }
+        }
+    });
+}
+
+// Xử lý nút ĐẶT HÀNG
+if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        const customerForm = document.getElementById('customer-form');
+        if (!customerForm.checkValidity()) {
+            customerForm.reportValidity();
+            return;
+        }
+
+        const restaurantId = restaurantSelect.value;
+        if (!restaurantId || restaurantId === "0" || restaurantId === "") {
+            alert("Vui lòng chọn Nhà hàng để đặt món.");
+            restaurantSelect.focus();
+            return;
+        }
+
+        let adrsIdToSubmit = addressSelect.value;
+        const originalBtnContent = checkoutBtn.innerHTML;
+        checkoutBtn.disabled = true;
+        checkoutBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
+
+        try {
+            if (adrsIdToSubmit === 'new') {
+                const newAddressData = {
+                    AdrsCustomerName: inputName.value,
+                    Phone: inputPhone.value,
+                    AdrsLine: inputAddress.value,
+                    IsDefault: false,
+                    Latitude: 0,
+                    Longitude: 0
+                };
+
+                const newAddrResponse = await addAddress(newAddressData);
+
+                if (newAddrResponse && newAddrResponse.AdrsID) {
+                    adrsIdToSubmit = newAddrResponse.AdrsID;
+                } else if (typeof newAddrResponse === 'number') {
+                    adrsIdToSubmit = newAddrResponse;
+                } else {
+                    const freshList = await getMyAddresses();
+                    if (freshList.length > 0) adrsIdToSubmit = freshList[freshList.length - 1].adrsID;
+                }
+            }
+
+            const orderData = {
+                adrsId: adrsIdToSubmit,
+                restaurantId: restaurantId,
+            };
+
+            const result = await placeOrder(orderData);
+
+            if (result.isSuccess && result.paymentUrl) {
+                window.location.href = result.paymentUrl;
+            } else {
+                alert("Đặt hàng thành công nhưng không có URL thanh toán.");
+                window.location.href = "/Account/Index";
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert(`Lỗi: ${error.message}`);
+            checkoutBtn.disabled = false;
+            checkoutBtn.innerHTML = originalBtnContent;
+        }
+    });
+}
+
+// --- INIT ---
+document.addEventListener('DOMContentLoaded', () => {
+    renderSummary();
+    loadRestaurants();
+    loadAddresses();
 });

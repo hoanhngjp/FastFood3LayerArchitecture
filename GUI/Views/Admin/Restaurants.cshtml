@@ -1,0 +1,106 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Nhà hàng";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex gap-2">
+        <div class="input-group" style="width: 300px;">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+            <input type="text" id="searchKeyword" class="form-control border-start-0 ps-0" placeholder="Tìm tên, địa chỉ...">
+        </div>
+        <select id="pageSizeSelect" class="form-select" style="width: 140px;">
+            <option value="5" selected>Hiển thị 5</option>
+            <option value="10">Hiển thị 10</option>
+            <option value="20">Hiển thị 20</option>
+        </select>
+    </div>
+    <button class="btn btn-primary shadow-sm" onclick="openResModal()">
+        <i class="bi bi-plus-lg"></i> Thêm nhà hàng
+    </button>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4">Tên nhà hàng</th>
+                    <th>Địa chỉ</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end pe-4">Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="resTableBody">
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+        <span class="text-muted small" id="pagingInfo">...</span>
+        <nav>
+            <ul class="pagination pagination-sm mb-0 justify-content-end" id="paginationControls"></ul>
+        </nav>
+    </div>
+</div>
+
+<div class="modal fade" id="resModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resModalTitle">Thêm nhà hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="resForm">
+                    <input type="hidden" id="resId">
+
+                    <div class="mb-3">
+                        <label class="form-label">Tên nhà hàng <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="resName" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Địa chỉ <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="resAddress" required>
+                        <div class="form-text text-muted small">Tự động tìm tọa độ khi thay đổi.</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control" id="resPhone">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Giờ mở cửa</label>
+                            <input type="text" class="form-control" id="resHours" placeholder="08:00 - 22:00">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Quản lý nhà hàng <span class="text-danger">*</span></label>
+                        <select class="form-select" id="resManager" required>
+                            <option value="">Đang tải danh sách...</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-select" id="resStatus">
+                            <option value="1">Opening (Đang mở)</option>
+                            <option value="2">Closed (Đóng cửa)</option>
+                            <option value="3">Suspended (Đình chỉ)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="saveRestaurant()">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="module" src="~/js/admin/pages/restaurant.js"></script>
+}

@@ -86,58 +86,123 @@ namespace BUS.Services.DroneService
         {
             // 1. Kiểm tra Order
             var order = await _uow.Orders.GetByIdAsync(dto.OrderId);
-            if (order == null || order.StatusID != 2) // Giả sử 2 là Confirmed (sẵn sàng giao)
+            // Giả sử 2 là Confirmed (sẵn sàng giao)
+            if (order == null || order.StatusID != 2)
                 return "Đơn hàng không hợp lệ hoặc chưa sẵn sàng.";
 
-            // 2. Kiểm tra Drone
-            var drone = await _uow.Repository<Drone>().GetByIdAsync(dto.DroneId);
-            if (drone == null || drone.StatusID != 1) // Giả sử 1 là Idle
+            // 2. Kiểm tra Drone VÀ Load thông tin Trạm (DroneStation)
+            // SỬA: Dùng GetAsync để Include "DroneStation" lấy tọa độ trạm
+            var drones = await _uow.Repository<Drone>().GetAsync(
+                filter: d => d.DroneID == dto.DroneId,
+                includeProperties: "DroneStation"
+            );
+            var drone = drones.FirstOrDefault();
+
+            // Giả sử 1 là Idle (Rảnh)
+            if (drone == null || drone.StatusID != 1)
                 return "Drone không tồn tại hoặc đang bận.";
 
-            // 3. Tạo Delivery Record theo Entity mới
+            // 3. Tạo Delivery Record
             var delivery = new Delivery
             {
                 OrderID = dto.OrderId,
                 DroneID = dto.DroneId,
 
-                EstimatedPickupTime = DateTime.UtcNow.AddMinutes(10),
-                EstimatedDropoffTime = DateTime.UtcNow.AddMinutes(30),
+                // SỬA: Thời gian Pickup không phải là Now, mà là Now + Thời gian bay từ Trạm đến Quán
+                EstimatedPickupTime = DateTime.UtcNow.AddSeconds(60), // Giả sử mất 10p để đến quán
+                EstimatedDropoffTime = DateTime.UtcNow.AddSeconds(120), // Giả sử tổng cộng 30p
 
-                StatusID = 1 // Status 1: "Assigned" hoặc "In Progress" (tùy bảng DeliveryStatus)
+                StatusID = 1 // Status 1: "Assigned"
             };
 
             await _uow.Repository<Delivery>().AddAsync(delivery);
 
-            // 4. Cập nhật Drone -> Busy
+            // 4. QUAN TRỌNG: Reset vị trí Drone về Trạm (Điểm xuất phát)
+            // Để logic tính toán đường đi (Trạm -> Nhà hàng) ở Client/Service hoạt động đúng
+            if (drone.DroneStation != null)
+            {
+                drone.CurrentLocation_Lat = drone.DroneStation.Location_Lat;
+                drone.CurrentLocation_Lng = drone.DroneStation.Location_Lng;
+            }
+
+            // 5. Cập nhật Drone -> Busy
             var busyStatus = (await _uow.Repository<DroneStatus>().FindAsync(s => s.StatusName == "Busy")).FirstOrDefault();
             if (busyStatus != null)
                 drone.StatusID = busyStatus.StatusID;
 
-            // 5. Cập nhật Order -> Delivering
+            // 6. Cập nhật Order -> Delivering
             var deliveringStatus = (await _uow.Repository<OrderStatus>().FindAsync(s => s.StatusName == "Delivering")).FirstOrDefault();
             if (deliveringStatus != null)
                 order.StatusID = deliveringStatus.StatusID;
 
+            // 7. Lưu thay đổi
             _uow.Repository<Drone>().Update(drone);
             _uow.Orders.Update(order);
 
             await _uow.SaveChangesAsync();
             return "Success";
         }
+        public async Task<bool> UpdateAsAdminAsync(int id, UpdateDroneDTO dto)
+        {
+            var entity = await _uow.Repository<Drone>().GetByIdAsync(id);
+            if (entity == null) return false;
+
+            entity.Model = dto.Model;
+            entity.CurrentBattery = dto.CurrentBattery;
+            entity.MaxLoad = dto.MaxLoad;
+            entity.StatusID = dto.StatusID;
+
+            // Nếu đổi trạm, cập nhật luôn vị trí về trạm mới (Logic tùy chọn)
+            if (entity.StationID != dto.StationID)
+            {
+                var newStation = await _uow.Repository<DroneStation>().GetByIdAsync(dto.StationID);
+                if (newStation != null)
+                {
+                    entity.StationID = dto.StationID;
+                    entity.CurrentLocation_Lat = newStation.Location_Lat;
+                    entity.CurrentLocation_Lng = newStation.Location_Lng;
+                }
+            }
+
+            _uow.Repository<Drone>().Update(entity);
+            await _uow.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<IEnumerable<DroneStationDTO>> GetAllStationsAsync()
+        {
+            var stations = await _uow.Repository<DroneStation>().GetAllAsync();
+            return stations.Select(s => new DroneStationDTO
+            {
+                StationID = s.StationID,
+                Name = s.Name,
+                Address = s.Address
+            });
+        }
+
+        // Helper Map
         private DroneDTO MapToDTO(Drone d)
         {
+            string statusName = d.StatusID switch
+            {
+                1 => "Idle",
+                2 => "Charging",
+                3 => "Delivering",
+                4 => "Busy",
+                9 => "Maintenance",
+                _ => "Unknown"
+            };
             return new DroneDTO
             {
                 DroneID = d.DroneID,
                 Model = d.Model,
                 CurrentBattery = d.CurrentBattery ?? 0,
                 MaxLoad = d.MaxLoad ?? 0,
-                // Map tọa độ mới
                 CurrentLat = d.CurrentLocation_Lat,
                 CurrentLng = d.CurrentLocation_Lng,
                 StationID = d.StationID,
-                StationName = d.DroneStation?.Name ?? "N/A",
-                StatusName = d.DroneStatus?.StatusName ?? "Unknown"
+                StationName = d.DroneStation?.Name ?? "Unknown Station",
+                StatusName = statusName
             };
         }
     }

@@ -1,43 +1,113 @@
 ﻿@{
-    Layout = "_AdminLayout";
     ViewData["Title"] = "Quản lý Đơn hàng";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<h2 class="mb-4">📋 Quản lý Đơn hàng</h2>
-
-<div class="card shadow-sm">
-    <div class="card-header bg-white py-3">
-        <h5 class="mb-0">Danh sách Đơn hàng (<span id="total-orders-count">0</span> đơn)</h5>
-    </div>
-    <div class="card-body">
-        <p class="text-muted">Đây là nơi hiển thị bảng chi tiết các đơn hàng, bao gồm trạng thái, tổng tiền và thông tin khách hàng.</p>
-
-        <div id="loading-area" class="text-center p-5">
-            <div class="spinner-border text-primary me-2" role="status"></div>
-            <p class="mt-2 text-muted">Đang tải dữ liệu đơn hàng...</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex gap-2">
+        <div class="input-group" style="width: 250px;">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+            <input type="text" id="searchKeyword" class="form-control border-start-0 ps-0" placeholder="Tìm ID, Tên khách...">
         </div>
-        <div id="error-message-area" class="alert alert-danger" style="display: none;"></div>
 
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>Mã Đơn</th>
-                        <th>Khách hàng</th>
-                        <th>Ngày đặt</th>
-                        <th>Tổng tiền</th>
-                        <th>Trạng thái</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
+        <select id="filterStatus" class="form-select" style="width: 170px;">
+            <option value="">-- Tất cả trạng thái --</option>
+            <option value="Pending">Pending (Chờ xử lý)</option>
+            <option value="Confirmed">Confirmed (Đã xác nhận)</option>
+            <option value="Preparing">Preparing (Đang chuẩn bị)</option>
+            <option value="Delivering">Delivering (Đang giao)</option>
+            <option value="Delivered">Delivered (Đã giao hàng)</option>
+            <option value="Completed">Completed (Hoàn tất)</option>
+            <option value="Cancelled">Cancelled (Đã hủy)</option>
+        </select>
 
-                <tbody id="orders-table-body">
-                </tbody>
-            </table>
+        <select id="filterRestaurant" class="form-select" style="width: 200px;">
+            <option value="">-- Đang tải nhà hàng... --</option>
+        </select>
+
+        <select id="pageSizeSelect" class="form-select" style="width: 120px;">
+            <option value="5">Hiển thị 5</option>
+            <option value="10" selected>Hiển thị 10</option>
+            <option value="20">Hiển thị 20</option>
+        </select>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4">ID</th>
+                    <th>Thời gian</th>
+                    <th>Nhà hàng</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end pe-4">Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="orderTableBody"></tbody>
+        </table>
+    </div>
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+        <span class="text-muted small" id="pagingInfo">...</span>
+        <nav><ul class="pagination pagination-sm mb-0 justify-content-end" id="paginationControls"></ul></nav>
+    </div>
+</div>
+
+<div class="modal fade" id="orderDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết Đơn hàng #<span id="detailOrderId"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>Ngày đặt:</strong> <span id="detailDate"></span></p>
+                        <p><strong>Nhà hàng:</strong> <span id="detailRestaurant"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Tổng tiền:</strong> <span id="detailTotal" class="text-primary fw-bold"></span></p>
+                        <div class="d-flex align-items-center">
+                            <strong class="me-2">Trạng thái:</strong>
+                            <select id="detailStatusSelect" class="form-select form-select-sm" style="width: auto;">
+                                <option value="1">Pending</option>
+                                <option value="2">Confirmed</option>
+                                <option value="3">Preparing</option>
+                                <option value="4">Delivering</option>
+                                <option value="6">Delivered</option>
+                                <option value="5">Completed</option>
+                                <option value="99">Cancelled</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-primary ms-2" onclick="updateOrderStatus()">Lưu</button>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <h6 class="fw-bold">Danh sách món ăn</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Món ăn</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-end">Đơn giá</th>
+                                <th class="text-end">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailItemsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
         </div>
     </div>
 </div>
 
-<script type="module" src="/js/authChecker.js"></script>
-<script type="module" src="/js/orderService.js"></script>
-<script type="module" src="/js/adminOrder.js"></script>
+@section Scripts {
+    <script type="module" src="~/js/admin/pages/order.js"></script>
+}

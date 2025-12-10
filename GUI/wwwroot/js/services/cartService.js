@@ -1,170 +1,106 @@
-﻿// /js/services/cartService.js
+﻿// GUI/wwwroot/js/services/cartService.js
+import { callApi } from './apiClient.js';
 
-/**
- * Tên key lưu trữ giỏ hàng trong LocalStorage.
- */
-const CART_STORAGE_KEY = 'foodCart';
+const ENDPOINT = '/cart';
 
-/**
- * Định dạng số thành chuỗi tiền tệ (VNĐ).
- * @param {number} amount - Số tiền cần định dạng.
- * @returns {string} - Chuỗi tiền tệ đã định dạng (ví dụ: '100.000 VNĐ').
- */
+// --- CÁC HÀM UTILS ---
 export function formatCurrency(amount) {
-    if (typeof amount !== 'number') {
-        amount = 0;
-    }
-    // Sử dụng Intl.NumberFormat để định dạng theo locale Việt Nam
+    if (typeof amount !== 'number') amount = 0;
     return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
         currency: 'VND',
-        minimumFractionDigits: 0, // Không hiển thị số thập phân
+        minimumFractionDigits: 0,
     }).format(amount);
 }
 
-/**
- * Phát ra sự kiện tùy chỉnh để thông báo giỏ hàng đã được cập nhật.
- * Các thành phần khác (ví dụ: cart.js, cartNotifier.js) sẽ lắng nghe sự kiện này.
- */
 function notifyCartUpdate() {
     const event = new CustomEvent('cartUpdated');
     document.dispatchEvent(event);
 }
 
-/**
- * Lưu giỏ hàng hiện tại vào LocalStorage.
- * @param {Array<Object>} cart - Mảng các đối tượng giỏ hàng.
- */
-function saveCart(cart) {
-    try {
-        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-        notifyCartUpdate(); // Thông báo sau khi lưu thành công
-    } catch (e) {
-        console.error("Lỗi khi lưu giỏ hàng vào LocalStorage: ", e);
-    }
-}
+// --- CÁC HÀM API ---
 
-/**
- * Lấy giỏ hàng từ LocalStorage.
- * @returns {Array<Object>} - Mảng các món hàng trong giỏ, hoặc mảng rỗng nếu không có.
- */
-export function getCart() {
+export const getCart = async () => {
     try {
-        const storedCart = localStorage.getItem(CART_STORAGE_KEY);
-        // Đảm bảo trả về mảng nếu null hoặc không hợp lệ
-        return storedCart ? JSON.parse(storedCart) : [];
+        const data = await callApi(ENDPOINT, null, 'GET');
+        // Xử lý an toàn nếu API trả về null hoặc thiếu field
+        const rawItems = data?.items || data?.Items || [];
+
+        return rawItems.map(item => ({
+            id: item.foodID || item.FoodID,
+            name: item.foodName || item.FoodName,
+            price: item.price || item.Price,
+            quantity: item.quantity || item.Quantity,
+            imageUrl: item.imageURL || item.ImageURL,
+            totalPrice: item.totalPrice || item.TotalPrice
+        }));
     } catch (e) {
-        console.error("Lỗi khi đọc giỏ hàng từ LocalStorage: ", e);
+        console.error("Lỗi lấy giỏ hàng:", e);
         return [];
     }
-}
+};
 
-/**
- * Cập nhật số lượng của một món hàng cụ thể trong giỏ hàng.
- * @param {number} foodId - ID của món ăn.
- * @param {number} quantity - Số lượng mới.
- */
-export function updateItemQuantity(foodId, quantity) {
-    const cart = getCart();
-    const itemIndex = cart.findIndex(item => item.id === foodId);
-
-    if (itemIndex > -1) {
-        // Đảm bảo số lượng là số dương, tối thiểu là 1
-        cart[itemIndex].quantity = Math.max(1, quantity);
-        saveCart(cart);
-    }
-}
-
-/**
- * Xóa một món hàng khỏi giỏ hàng.
- * @param {number} foodId - ID của món ăn.
- */
-export function removeItem(foodId) {
-    let cart = getCart();
-    // Lọc ra món hàng có ID tương ứng
-    cart = cart.filter(item => item.id !== foodId);
-    saveCart(cart);
-}
-
-/**
- * Tính tổng tiền hàng (chưa bao gồm phí giao hàng và giảm giá).
- * @param {Array<Object>} cart - Mảng các món hàng trong giỏ.
- * @returns {number} - Tổng tiền hàng.
- */
-export function calculateSubtotal(cart) {
-    // Đảm bảo item.price và item.quantity là số hợp lệ
-    return cart.reduce((total, item) => total + (
-        (typeof item.price === 'number' ? item.price : 0) * (typeof item.quantity === 'number' ? item.quantity : 0)
-    ), 0);
-}
-
-/**
- * [Hàm bổ sung cần thiết cho trang sản phẩm/menu]
- * Thêm một món ăn mới hoặc cập nhật số lượng của món ăn đã có.
- * @param {Object} item - Đối tượng món ăn { id, name, price, quantity, imageUrl, category }.
- */
-export function addToCart(item) {
-    if (!item.id || !item.price || !item.quantity) {
-        console.error("Thiếu thông tin món ăn (id, price, quantity)!");
+export const addToCart = async (item) => {
+    if (!item.id || !item.quantity) {
+        console.error("Thiếu thông tin món ăn!");
         return;
     }
-
-    const cart = getCart();
-    const existingItemIndex = cart.findIndex(cartItem => cartItem.id === item.id);
-
-    if (existingItemIndex > -1) {
-        // Cập nhật số lượng
-        cart[existingItemIndex].quantity += item.quantity;
-    } else {
-        // Thêm mới
-        cart.push(item);
+    try {
+        await callApi(`${ENDPOINT}/add`, {
+            FoodID: item.id,
+            Quantity: item.quantity
+        }, 'POST');
+        notifyCartUpdate();
+    } catch (e) {
+        console.error("Lỗi thêm giỏ hàng:", e);
+        alert("Lỗi: " + e.message);
+        throw e; // Ném lỗi để UI (như nút Add) biết mà xử lý (ví dụ: ngừng loading)
     }
+};
 
-    saveCart(cart);
-}
+export const updateItemQuantity = async (foodId, quantity) => {
+    try {
+        await callApi(`${ENDPOINT}/update`, {
+            FoodID: foodId,
+            Quantity: quantity
+        }, 'PUT');
+        notifyCartUpdate();
+    } catch (e) {
+        console.error("Lỗi cập nhật giỏ:", e);
+    }
+};
 
-// /js/services/cartService.js (Bổ sung)
+export const removeItem = async (foodId) => {
+    try {
+        await callApi(`${ENDPOINT}/${foodId}`, null, 'DELETE');
+        notifyCartUpdate();
+    } catch (e) {
+        console.error("Lỗi xóa món:", e);
+    }
+};
 
-// ... (các hàm đã có: formatCurrency, notifyCartUpdate, saveCart, getCart, updateItemQuantity, removeItem, calculateSubtotal) ...
+export const clearCart = async () => {
+    try {
+        await callApi(`${ENDPOINT}/clear`, null, 'DELETE');
+        notifyCartUpdate();
+    } catch (e) {
+        console.error("Lỗi xóa giỏ hàng:", e);
+    }
+};
 
-const DEFAULT_SHIPPING_FEE = 30000;
-
-/**
- * Tính toán Tóm tắt giỏ hàng chi tiết cho trang Checkout.
- * @returns {Object} { cartItems, subtotal, totalAmount, shippingFee }
- */
-export function getCartSummaryForCheckout() {
-    const cartItems = getCart();
-    const subtotal = calculateSubtotal(cartItems);
-
-    // Chỉ tính phí ship nếu có hàng
+export const getCartSummaryForCheckout = async () => {
+    const cartItems = await getCart();
+    const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const DEFAULT_SHIPPING_FEE = 30000;
     const shippingFee = subtotal > 0 ? DEFAULT_SHIPPING_FEE : 0;
-
-    // Giảm giá mặc định 0 ở đây, nếu có logic Coupon thì thêm vào
-    const discount = 0;
-
+    const discount = 0; // Logic mã giảm giá sẽ thêm sau
     const totalAmount = subtotal + shippingFee - discount;
 
-    return {
-        cartItems: cartItems,
-        subtotal: subtotal,
-        totalAmount: totalAmount,
-        shippingFee: shippingFee,
-        discount: discount // Có thể trả về discount nếu cần
-    };
-}
+    return { cartItems, subtotal, totalAmount, shippingFee, discount };
+};
 
-/**
- * Xóa toàn bộ giỏ hàng khỏi Local Storage.
- */
-export function clearCart() {
-    try {
-        localStorage.removeItem(CART_STORAGE_KEY);
-        notifyCartUpdate(); // Thông báo để cập nhật UI
-        console.log("Giỏ hàng đã được xóa thành công.");
-    } catch (e) {
-        console.error("Lỗi khi xóa giỏ hàng: ", e);
-    }
-}
-
-// ... (các hàm đã có) ...
+// Hàm synchronous cũ, giữ lại để tránh lỗi reference nếu file nào đó lỡ gọi
+export const calculateSubtotal = (cart) => {
+    if (!Array.isArray(cart)) return 0;
+    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+};

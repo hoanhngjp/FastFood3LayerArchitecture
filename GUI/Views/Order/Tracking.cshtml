@@ -1,0 +1,215 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Theo dõi vận chuyển";
+    int orderId = ViewBag.OrderId;
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #map {
+        height: 500px;
+        width: 100%;
+        border-radius: 12px;
+        border: 2px solid #ffc107;
+        z-index: 1;
+    }
+
+    .tracking-info {
+        background: #fff9f0;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    /* Animation nhẹ cho thanh pin */
+    .progress-bar {
+        transition: width 0.5s ease;
+    }
+</style>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="tracking-info shadow-sm h-100">
+                <h4 class="fw-bold text-warning mb-3"><i class="bi bi-box-seam me-2"></i> Đơn hàng #@orderId</h4>
+
+                <div class="mb-3">
+                    <label class="text-muted small">Trạng thái:</label>
+                    <h5 id="status-text" class="fw-bold text-primary">Đang kết nối...</h5>
+                    <div id="status-message" class="text-secondary small fst-italic mt-1"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted small">Drone vận chuyển:</label>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-airplane-engines fs-4 me-2 text-dark"></i>
+                        <span id="drone-model" class="fw-bold">Đang tìm kiếm...</span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted small">Dung lượng Pin:</label>
+                    <div class="progress" style="height: 20px;">
+                        <div id="drone-battery-bar" class="progress-bar bg-secondary" style="width: 0%">--%</div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="alert alert-light border small">
+                    <div class="d-flex align-items-center mb-1">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4287/4287725.png" width="20" class="me-2" />
+                        <span>: Nhà hàng (Điểm lấy món)</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <img src="https://cdn-icons-png.flaticon.com/512/25/25694.png" width="20" class="me-2" />
+                        <span>: Địa chỉ của bạn</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <img src="https://cdn-icons-png.flaticon.com/512/9018/9018920.png" width="20" class="me-2" />
+                        <span>: Drone đang bay</span>
+                    </div>
+                </div>
+
+                <a href="/Account/Index" class="btn btn-outline-secondary w-100 mt-2">Quay lại Lịch sử</a>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div id="map" class="shadow-sm"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module">
+    import { callApi } from '/js/services/apiClient.js';
+
+    const orderId = @orderId;
+    let map, droneMarker, destMarker, restMarker;
+    let isMapInitialized = false;
+
+    // --- ĐỊNH NGHĨA ICON ---
+
+    // 1. Icon Drone (Máy bay)
+    const droneIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/7893/7893979.png'
+        iconSize: [45, 45],
+        iconAnchor: [22, 22],
+        popupAnchor: [0, -20],
+        className: 'drone-marker-icon' // Có thể thêm CSS xoay nếu muốn
+    });
+
+    // 2. Icon Nhà (Khách hàng)
+    const homeIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/25/25694.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -30]
+    });
+
+    // 3. Icon Nhà Hàng (Mới thêm)
+    const restaurantIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/4287/4287725.png', // Icon Cửa hàng/Shop
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -30]
+    });
+
+    async function updateTracking() {
+        try {
+            const data = await callApi(`/orders/${orderId}/tracking`, null, 'GET');
+
+            // Nếu API trả về lỗi hoặc null (ví dụ chưa gán Drone)
+            if (!data || data.message) {
+                document.getElementById('status-text').innerText = data?.message || "Đang chờ xử lý...";
+                setTimeout(updateTracking, 3000);
+                return;
+            }
+
+            // --- A. CẬP NHẬT GIAO DIỆN TEXT ---
+            document.getElementById('status-text').innerText = data.statusName || 'Unknown';
+            document.getElementById('drone-model').innerText = data.droneModel || 'Chưa gán';
+
+            // Cập nhật thông báo tiến độ (1/3, 2/3...)
+            if (data.notificationMessage) {
+                document.getElementById('status-message').innerText = data.notificationMessage;
+            }
+
+            // Alert Popup nếu Drone đến quán
+            if (data.showPopup) {
+                // Dùng Toast hoặc alert nhẹ, ở đây dùng console log để tránh spam
+                console.log("POPUP: Drone đã đến nhà hàng!");
+            }
+
+            // Pin
+            const battery = data.droneBattery || 0;
+            const bar = document.getElementById('drone-battery-bar');
+            bar.style.width = `${battery}%`;
+            bar.innerText = `${battery.toFixed(0)}%`;
+            bar.className = `progress-bar ${battery < 20 ? 'bg-danger' : 'bg-success'}`;
+
+
+            // --- B. MAP LOGIC ---
+            // Lấy tọa độ từ DTO (Lưu ý JS dùng camelCase so với C# PascalCase)
+            const { currentDroneLat, currentDroneLng, destLat, destLng, restaurantLat, restaurantLng } = data;
+
+            // 1. Khởi tạo bản đồ (Chạy 1 lần duy nhất)
+            if (!isMapInitialized && destLat && destLng && restaurantLat && restaurantLng) {
+                map = L.map('map'); // Chưa setView vội, để fitBounds sau
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Marker: Khách hàng
+                destMarker = L.marker([destLat, destLng], {icon: homeIcon}).addTo(map)
+                    .bindPopup("<b>Điểm giao hàng</b><br>Nhà của bạn");
+
+                // Marker: Nhà hàng
+                restMarker = L.marker([restaurantLat, restaurantLng], {icon: restaurantIcon}).addTo(map)
+                    .bindPopup("<b>Nhà hàng</b><br>Điểm lấy món");
+
+                // Tự động zoom bản đồ để thấy cả Nhà hàng và Khách hàng
+                const group = new L.featureGroup([destMarker, restMarker]);
+                map.fitBounds(group.getBounds().pad(0.1)); // pad 10% để không bị sát lề
+
+                isMapInitialized = true;
+            }
+
+            if (!isMapInitialized) return;
+
+            // 2. Cập nhật vị trí Drone (Real-time)
+            if (currentDroneLat && currentDroneLng) {
+                if (!droneMarker) {
+                    droneMarker = L.marker([currentDroneLat, currentDroneLng], {icon: droneIcon, zIndexOffset: 1000}).addTo(map)
+                        .bindPopup("<b>Drone</b><br>Đang di chuyển");
+                } else {
+                    droneMarker.setLatLng([currentDroneLat, currentDroneLng]);
+
+                    // Tùy chọn: Nếu muốn Map luôn đi theo Drone thì bỏ comment dòng dưới
+                    // map.panTo([currentDroneLat, currentDroneLng]);
+                }
+            }
+
+            // --- C. AUTO RELOAD LOOP ---
+            const activeStatuses = ['Delivering', 'Shipping', 'Confirmed', 'Picking Up'];
+
+            if (activeStatuses.includes(data.statusName)) {
+                setTimeout(updateTracking, 2000); // 2 giây cập nhật 1 lần
+            } else if (data.statusName === 'Delivered' || data.statusName === 'Success') {
+                document.getElementById('status-text').className = "fw-bold text-success";
+                document.getElementById('status-message').innerText = "Đơn hàng đã hoàn tất.";
+
+                // Cập nhật pin lần cuối
+                if(droneMarker) droneMarker.setLatLng([destLat, destLng]);
+                alert("Đơn hàng đã giao thành công! Cảm ơn bạn.");
+            }
+
+        } catch (e) {
+            console.error("Tracking Error:", e);
+            setTimeout(updateTracking, 5000); // Thử lại sau 5s nếu lỗi mạng
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', updateTracking);
+</script>

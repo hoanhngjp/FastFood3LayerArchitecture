@@ -25,8 +25,12 @@ namespace BUS.Services
         Task<OrderCreationResponseDTO> CreateAsync(OrderDTO dto, int userIdFromToken);
         Task<UpdateStatusResult> UpdateStatusAsync(int orderId, string status);
         Task<bool> DeleteAsync(int id);
+        Task<IEnumerable<OrderDTO>> GetMyOrdersAsync(int userId);
         Task<IEnumerable<OrderDTO>> GetOrdersForRestaurantAsync(int restaurantId, string statusFilter, int managerUserId);
         Task<UpdateStatusResult> ConfirmOrderAsync(int orderId, int managerUserId);
         Task<UpdateStatusResult> CancelOrderAsync(int orderId, int managerUserId);
+        Task<OrderTrackingDTO?> GetOrderTrackingAsync(int orderId);
+        Task<UpdateStatusResult> ConfirmOrderAsAdminAsync(int orderId);
+        Task<bool> UpdateStatusAsAdminAsync(int orderId, int statusId);
     }
 }

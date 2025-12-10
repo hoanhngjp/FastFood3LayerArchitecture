@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Trạm Drone"; Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Danh sách Trạm Drone</h2>
+    <button class="btn btn-primary" onclick="openStationModal()"><i class="bi bi-plus-lg"></i> Thêm Trạm</button>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr><th class="ps-4">Tên Trạm</th><th>Địa chỉ</th><th>Tọa độ</th><th class="text-end pe-4">Hành động</th></tr>
+            </thead>
+            <tbody id="stationTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="stationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title" id="stationModalTitle">Thêm Trạm</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <form id="stationForm">
+                    <input type="hidden" id="stationId">
+                    <div class="mb-3"><label class="form-label">Tên trạm</label><input type="text" class="form-control" id="stationName" required></div>
+                    <div class="mb-3">
+                        <label class="form-label">Địa chỉ</label>
+                        <input type="text" class="form-control" id="stationAddress" required>
+                        <div class="form-text text-muted">Hệ thống sẽ tự động tìm tọa độ khi lưu.</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="saveStation()" id="btnSaveStation">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="module" src="~/js/admin/pages/station.js"></script>
+}

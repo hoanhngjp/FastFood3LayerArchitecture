@@ -1,33 +1,31 @@
-﻿// /js/common/cartNotifier.js
+﻿// GUI/wwwroot/js/common/cartNotifier.js
 import { getCart } from '../services/cartService.js';
 
 const cartItemCountEl = document.getElementById('cart-item-count');
 
-/**
- * Tính tổng số món hàng (số lượng) trong giỏ hàng.
- * @param {Array} cart 
- * @returns {number}
- */
 function getTotalItemCount(cart) {
+    if (!Array.isArray(cart)) return 0;
     return cart.reduce((count, item) => count + item.quantity, 0);
 }
 
 /**
- * Cập nhật số lượng trên biểu tượng giỏ hàng ở Header/Navbar.
+ * Cập nhật số lượng badge (Async function)
  */
-function updateCartBadge() {
+async function updateCartBadge() {
     if (!cartItemCountEl) return;
 
-    const cart = getCart();
-    const totalItems = getTotalItemCount(cart);
+    try {
+        // Phải await vì getCart bây giờ gọi API
+        const cart = await getCart();
+        const totalItems = getTotalItemCount(cart);
 
-    cartItemCountEl.textContent = totalItems > 99 ? '99+' : totalItems;
-    // Hiển thị badge nếu có hàng, ẩn nếu giỏ hàng trống
-    cartItemCountEl.style.display = totalItems > 0 ? 'inline-block' : 'none';
+        cartItemCountEl.textContent = totalItems > 99 ? '99+' : totalItems;
+        cartItemCountEl.style.display = totalItems > 0 ? 'flex' : 'none'; // Thường badge dùng flex để căn giữa
+    } catch (error) {
+        console.error("Không thể cập nhật badge giỏ hàng:", error);
+    }
 }
 
-// Lắng nghe sự kiện "cartUpdated" được gửi từ cartService.js
+// Lắng nghe sự kiện
 document.addEventListener('cartUpdated', updateCartBadge);
-
-// Khởi tạo lần đầu khi trang tải xong
 document.addEventListener('DOMContentLoaded', updateCartBadge);

@@ -50,7 +50,7 @@
         color: #E67E22; /* Màu cam đất */
     }
 
-    .text-dark-orange { /* Đã thêm để đồng bộ màu */
+    .text-dark-orange {
         color: #E67E22 !important;
     }
 
@@ -64,19 +64,31 @@
     .qty-input[type=number] {
         -moz-appearance: textfield;
     }
+
+    /* Style cho nút disabled (bổ sung cho thẻ a) */
+    a.disabled {
+        pointer-events: none;
+        cursor: default;
+        opacity: 0.6;
+    }
 </style>
 
 <div class="container my-5">
 
     <h2 class="cart-title">
-        Giỏ hàng của bạn <span class="text-muted fs-5 fw-normal">(0 món)</span>
+        Giỏ hàng của bạn <span class="text-muted fs-5 fw-normal" id="cart-title-count">(0 món)</span>
     </h2>
 
     <div class="row g-4 cart-content-wrapper">
 
         <div class="col-lg-8">
             <div class="cart-items-list">
-                <div class="text-center p-5 text-muted">Đang tải giỏ hàng...</div>
+                <div class="text-center p-5 text-muted">
+                    <div class="spinner-border text-warning" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="mt-2">Đang tải giỏ hàng...</div>
+                </div>
             </div>
         </div>
 
@@ -103,9 +115,10 @@
                 </div>
 
                 <div class="d-grid gap-2 mt-4">
-                    <a id="btn-checkout" href="/Checkout" class="btn btn-lg fw-bold" style="background-color: #FF8800; color: white;">
-                        <i class="bi bi-cart-check me-2"></i> Tiến hành Thanh toán
+                    <a id="btn-checkout" href="#" class="btn btn-lg fw-bold disabled" aria-disabled="true" style="background-color: #FF8800; color: white;">
+                        Giỏ hàng trống
                     </a>
+
                     <a href="/#food-menu" class="btn btn-outline-warning fw-bold">
                         <i class="bi bi-arrow-left me-2"></i> Tiếp tục chọn món
                     </a>

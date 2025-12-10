@@ -8,12 +8,16 @@ namespace DTO.DTO.Restaurant
 {
     public class RestaurantUpdateDTO
     {
+        public int RestaurantId { get; set; }
         public string Name { get; set; }
+
+        public int ManagerID { get; set; }
         public string Address { get; set; }
-        public string PhoneNumber { get; set; }
-        public string OpeningHours { get; set; } 
-        public decimal Location_Lat { get; set; }
-        public decimal Location_Lng { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? OpeningHours { get; set; }
+        public int? StatusID { get; set; }
+        public decimal? Location_Lat { get; set; }
+        public decimal? Location_Lng { get; set; }
     }
     public enum RestaurantResult
     {

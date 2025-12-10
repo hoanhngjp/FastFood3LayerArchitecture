@@ -3,10 +3,6 @@ using DTO.DTO.Payment;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BUS.Services.PaymentService
 {
@@ -24,10 +20,13 @@ namespace BUS.Services.PaymentService
             var timeZoneById = TimeZoneInfo.FindSystemTimeZoneById(_configuration["TimeZoneId"]);
             var timeNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZoneById);
 
-            var tick = model.OrderId.ToString();
+            // THAY ĐỔI: Tạo TxnRef bao gồm OrderId và thời gian để đảm bảo DUY NHẤT
+            // Ví dụ: 1050_63836640000000
+            var tick = DateTime.Now.Ticks.ToString();
+            var vnpTxnRef = $"{model.OrderId}_{tick}";
 
             var pay = new VnPayLibrary();
-            var urlCallBack = _configuration["Vnpay:PaymentBackReturnUrl"]; // Lấy ReturnUrl
+            var urlCallBack = _configuration["Vnpay:PaymentBackReturnUrl"];
             var expireDate = timeNow.AddMinutes(15).ToString("yyyyMMddHHmmss");
 
             pay.AddRequestData("vnp_Version", _configuration["Vnpay:Version"]);
@@ -36,13 +35,14 @@ namespace BUS.Services.PaymentService
             pay.AddRequestData("vnp_Amount", ((long)model.Amount * 100).ToString());
             pay.AddRequestData("vnp_CreateDate", timeNow.ToString("yyyyMMddHHmmss"));
             pay.AddRequestData("vnp_CurrCode", _configuration["Vnpay:CurrCode"]);
-            // pay.AddRequestData("vnp_IpAddr", pay.GetIpAddress(context));
-            pay.AddRequestData("vnp_IpAddr", "127.0.0.1");
+            pay.AddRequestData("vnp_IpAddr", "127.0.0.1"); // Môi trường dev set cứng cũng được
             pay.AddRequestData("vnp_Locale", _configuration["Vnpay:Locale"]);
             pay.AddRequestData("vnp_OrderInfo", $"{model.Name} {model.OrderDescription}");
             pay.AddRequestData("vnp_OrderType", model.OrderType);
             pay.AddRequestData("vnp_ReturnUrl", urlCallBack);
-            pay.AddRequestData("vnp_TxnRef", tick); // Dùng OrderID thật
+
+            // Sử dụng mã giao dịch độc nhất
+            pay.AddRequestData("vnp_TxnRef", vnpTxnRef);
             pay.AddRequestData("vnp_ExpireDate", expireDate);
 
             var paymentUrl =

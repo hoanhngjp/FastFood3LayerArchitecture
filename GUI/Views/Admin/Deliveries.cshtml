@@ -1,0 +1,80 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Vận chuyển";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex gap-2">
+        <div class="input-group" style="width: 300px;">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+            <input type="text" id="searchKeyword" class="form-control border-start-0 ps-0" placeholder="Tìm Mã đơn, Drone...">
+        </div>
+
+        <select id="filterStatus" class="form-select" style="width: 170px;">
+            <option value="">-- Tất cả --</option>
+            <option value="Assigning Drone">Assigning Drone</option>
+            <option value="Picking Up">Picking Up</option>
+            <option value="Dropping Off">Dropping Off</option>
+            <option value="Completed">Completed</option>
+            <option value="Failed">Failed</option>
+        </select>
+
+        <select id="pageSizeSelect" class="form-select" style="width: 120px;">
+            <option value="10">10 dòng</option>
+            <option value="20">20 dòng</option>
+        </select>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4">Mã Vận đơn</th>
+                    <th>Đơn hàng</th>
+                    <th>Drone</th>
+                    <th>Dự kiến giao</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end pe-4">Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="deliveryTableBody"></tbody>
+        </table>
+    </div>
+    <div class="card-footer bg-white py-3">
+        <nav><ul class="pagination pagination-sm mb-0 justify-content-end" id="paginationControls"></ul></nav>
+    </div>
+</div>
+
+<div class="modal fade" id="deliveryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cập nhật trạng thái #<span id="modalDeliveryId"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Drone: <strong id="modalDrone"></strong></p>
+                <div class="mb-3">
+                    <label class="form-label">Chọn trạng thái mới:</label>
+                    <select class="form-select" id="modalStatusSelect">
+                        <option value="1">Assigning Drone</option>
+                        <option value="2">Picking Up</option>
+                        <option value="3">Dropping Off</option>
+                        <option value="4">Completed</option>
+                        <option value="5">Failed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="updateDeliveryStatus()">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="module" src="~/js/admin/pages/delivery.js"></script>
+}

@@ -12,7 +12,7 @@
     .nav-pills .nav-link {
         color: #343a40;
     }
-    /* Thêm CSS cho Dashboard cards để phù hợp với màu cam */
+    /* Thêm CSS cho Dashboard cards */
     .card-light-orange {
         background-color: #fff9f0; /* Màu cam nhạt */
         border-color: #ffc107;
@@ -20,7 +20,7 @@
 
     .card-dark-orange {
         background-color: #ffc107; /* Màu cam đậm */
-        color: #343a40; /* Chữ đen/xám để tương phản */
+        color: #343a40;
     }
 
         .card-dark-orange .card-title {
@@ -28,7 +28,7 @@
         }
 
     .text-dark-orange {
-        color: #FF8800 !important; /* Đảm bảo màu cam chính */
+        color: #FF8800 !important;
     }
 </style>
 
@@ -62,14 +62,8 @@
                             </button>
                         </li>
 
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link w-100 text-start rounded-0" id="profile-tab" data-bs-toggle="pill" data-bs-target="#profile-pane" type="button" role="tab" aria-controls="profile-pane" aria-selected="false">
-                                <i class="bi bi-person-vcard me-2"></i> Thông tin cá nhân
-                            </button>
-                        </li>
-
-                        <li class="nav-item mt-3 px-3">
-                            <button type="button" class="btn btn-outline-danger w-100" id="account-logout-btn">
+                        <li class="nav-item mt-3 px-3 pb-3">
+                            <button type="button" class="btn btn-outline-danger w-100" id="account-logout-btn" onclick="import('/js/services/authService.js').then(m => m.logout().then(() => window.location.href='/'))">
                                 <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
                             </button>
                         </li>
@@ -87,65 +81,109 @@
 
                         <div class="row g-3">
                             <div class="col-md-6 col-lg-4">
-                                <div class="card card-light-orange shadow-sm">
-                                    <div class="card-body">
+                                <div class="card card-light-orange shadow-sm h-100">
+                                    <div class="card-body text-center">
                                         <h5 class="card-title"><i class="bi bi-bag-check-fill me-2"></i> Tổng đơn hàng</h5>
-                                        @* Dữ liệu sẽ được điền vào thẻ p này *@
-                                        <p class="card-text fs-2 fw-bold">0</p>
+                                        <p class="card-text fs-2 fw-bold mb-0">0</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6 col-lg-4">
-                                <div class="card card-dark-orange shadow-sm">
-                                    <div class="card-body">
+                                <div class="card card-dark-orange shadow-sm h-100">
+                                    <div class="card-body text-center">
                                         <h5 class="card-title"><i class="bi bi-currency-dollar me-2"></i> Tổng chi tiêu</h5>
-                                        @* Dữ liệu sẽ được điền vào thẻ p này *@
-                                        <p class="card-text fs-2 fw-bold">0₫</p>
+                                        <p class="card-text fs-2 fw-bold mb-0">0₫</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6 col-lg-4">
-                                <div class="card card-light-orange shadow-sm">
-                                    <div class="card-body">
+                                <div class="card card-light-orange shadow-sm h-100">
+                                    <div class="card-body text-center">
                                         <h5 class="card-title"><i class="bi bi-star-fill me-2"></i> Điểm tích lũy</h5>
-                                        @* Dữ liệu sẽ được điền vào thẻ p này *@
-                                        <p class="card-text fs-2 fw-bold">0</p>
+                                        <p class="card-text fs-2 fw-bold mb-0">0</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <h5 class="mt-4 mb-3 border-bottom pb-2 text-dark-orange">Đơn hàng gần đây</h5>
-                        @* List này sẽ được JS điền dữ liệu *@
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Đang tải đơn hàng gần đây...</li>
+                            <li class="list-group-item text-center p-3 text-muted">
+                                <div class="spinner-border spinner-border-sm text-warning" role="status"></div> Đang tải dữ liệu...
+                            </li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="tab-pane fade" id="orders-pane" role="tabpanel" aria-labelledby="orders-tab">
                     <div class="card shadow-sm p-4">
-                        <h4 class="fw-bold border-bottom pb-2 mb-3 text-dark-orange"><i class="bi bi-list-columns-reverse me-2"></i> Lịch sử Đơn hàng</h4>
-                        <p class="text-muted">Danh sách chi tiết đơn hàng đã đặt.</p>
+                        <h4 class="fw-bold border-bottom pb-2 mb-3 text-dark-orange">
+                            <i class="bi bi-list-columns-reverse me-2"></i> Lịch sử Đơn hàng
+                        </h4>
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover align-middle">
-                                <thead>
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
                                     <tr>
-                                        <th>Mã Đơn hàng</th>
+                                        <th>Mã Đơn</th>
                                         <th>Ngày đặt</th>
+                                        <th>Nhà hàng</th>
                                         <th>Tổng tiền</th>
                                         <th>Trạng thái</th>
-                                        <th>Chi tiết</th>
+                                        <th>Hành động</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @* Dữ liệu sẽ được điền bởi addressManager.js *@
+                                <tbody id="orders-table-body">
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4">
+                                            <div class="spinner-border text-warning" role="status"></div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
+                <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-light">
+                                <h5 class="modal-title fw-bold" id="orderDetailTitle">Chi tiết đơn hàng #...</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <p><strong>Ngày đặt:</strong> <span id="modal-order-date">...</span></p>
+                                        <p><strong>Trạng thái:</strong> <span id="modal-order-status">...</span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Tổng tiền:</strong> <span id="modal-order-total" class="text-danger fw-bold fs-5">...</span></p>
+                                    </div>
+                                </div>
+
+                                <h6 class="fw-bold border-bottom pb-2 mb-2">Danh sách món ăn</h6>
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Tên món</th>
+                                            <th class="text-center">Số lượng</th>
+                                            <th class="text-end">Đơn giá</th>
+                                            <th class="text-end">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="modal-items-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script type="module" src="/js/pages/account.js"></script>
                 <div class="tab-pane fade" id="addresses-pane" role="tabpanel" aria-labelledby="addresses-tab">
                     <div class="card shadow-sm p-4">
                         <h4 class="fw-bold border-bottom pb-2 mb-3 text-dark-orange"><i class="bi bi-geo-alt me-2"></i> Địa chỉ Giao hàng của tôi</h4>
@@ -158,60 +196,8 @@
                         </div>
 
                         <div id="address-list-container">
-                            @* Dữ liệu địa chỉ sẽ được điền bởi addressManager.js *@
                             <div class="text-center p-5"><span class="spinner-border text-warning" role="status"></span> Đang tải...</div>
                         </div>
-
-                    </div>
-                </div>
-
-
-                <div class="tab-pane fade" id="profile-pane" role="tabpanel" aria-labelledby="profile-tab">
-                    <div class="card shadow-sm p-4">
-                        <h4 class="fw-bold border-bottom pb-2 mb-3 text-dark-orange"><i class="bi bi-info-circle me-2"></i> Cập nhật Thông tin cá nhân</h4>
-
-                        <form class="row g-3" id="profile-update-form">
-                            <div class="col-md-6">
-                                <label for="inputName" class="form-label">Họ Tên (*)</label>
-                                <input type="text" class="form-control" id="inputName" value="" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="inputEmail" class="form-label">Email (*)</label>
-                                <input type="email" class="form-control" id="inputEmail" value="" disabled>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="inputPhone" class="form-label">Điện thoại (*)</label>
-                                <input type="tel" class="form-control" id="inputPhone" value="" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="inputGender" class="form-label">Giới tính</label>
-                                <select id="inputGender" class="form-select">
-                                    <option value="Nam">Nam</option>
-                                    <option value="Nữ">Nữ</option>
-                                    <option value="Khác">Khác</option>
-                                </select>
-                            </div>
-
-                            <h5 class="mt-4 mb-3 border-bottom pb-2 text-dark-orange">Đổi mật khẩu</h5>
-                            <div class="col-md-4">
-                                <label for="currentPassword" class="form-label">Mật khẩu Hiện tại</label>
-                                <input type="password" class="form-control" id="currentPassword">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="newPassword" class="form-label">Mật khẩu Mới</label>
-                                <input type="password" class="form-control" id="newPassword">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="confirmPassword" class="form-label">Xác nhận Mật khẩu Mới</label>
-                                <input type="password" class="form-control" id="confirmPassword">
-                            </div>
-
-                            <div class="col-12 mt-4">
-                                <button type="submit" class="btn btn-warning btn-lg text-dark fw-bold">
-                                    <i class="bi bi-save me-2"></i> Lưu Thay Đổi
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
 
@@ -240,18 +226,15 @@
                             <input type="tel" class="form-control" id="inputReceiverPhone" name="receiverPhone" required>
                         </div>
 
-                        <div class="col-md-4">
-                            <label for="inputCity" class="form-label">Tỉnh/Thành phố (*)</label>
-                            <input type="text" class="form-control" id="inputCity" name="city" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="inputWard" class="form-label">Phường/Xã (*)</label>
-                            <input type="text" class="form-control" id="inputWard" name="ward" required>
-                        </div>
-
                         <div class="col-12">
                             <label for="inputDetailedAddress" class="form-label">Địa chỉ chi tiết (Số nhà, đường...)</label>
-                            <input type="text" class="form-control" id="inputDetailedAddress" name="detailedAddress" required>
+                            <div class="input-group mb-1">
+                                <input type="text" class="form-control" id="inputDetailedAddress" name="detailedAddress" required placeholder="Số nhà, tên đường, phường/xã...">
+                                <button class="btn btn-outline-secondary" type="button" id="btn-get-location" title="Lấy vị trí hiện tại của bạn">
+                                    <i class="bi bi-geo-alt-fill"></i> Định vị
+                                </button>
+                            </div>
+                            <div id="location-status"></div>
                         </div>
 
                         <div class="col-12">
@@ -274,8 +257,8 @@
         </div>
     </div>
 </div>
-</div>
 
+<script type="module" src="/js/pages/account.js"></script>
 <script type="module" src="/js/services/addressService.js"></script>
 <script type="module" src="/js/addressManager.js"></script>
 <script type="module" src="/js/authChecker.js"></script>

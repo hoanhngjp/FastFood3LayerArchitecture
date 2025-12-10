@@ -1,5 +1,6 @@
 ﻿using BUS.Services;
 using BUS.Services.CartService;
+using DAT.Entity;
 using DTO.DTO;
 using DTO.DTO.Order;
 using Microsoft.AspNetCore.Authorization;
@@ -136,9 +137,6 @@ namespace WebAPI.Controllers
                 // 4. Gọi Service tạo đơn hàng
                 var response = await _orderService.CreateAsync(orderDto, userId);
 
-                // 5. QUAN TRỌNG: Xóa giỏ hàng sau khi tạo đơn thành công
-                await _cartService.ClearCartAsync();
-
                 // 6. Trả về kết quả (URL thanh toán VNPay)
                 return Ok(new
                 {
@@ -159,6 +157,19 @@ namespace WebAPI.Controllers
             {
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
+        }
+        [HttpGet("{id}/tracking")]
+        public async Task<IActionResult> GetOrderTracking(int id)
+        {
+            // Controller chỉ gọi Service, không biết gì về UoW hay DB
+            var trackingInfo = await _orderService.GetOrderTrackingAsync(id);
+
+            if (trackingInfo == null)
+            {
+                return NotFound(new { message = $"Không tìm thấy đơn hàng #{id}" });
+            }
+
+            return Ok(trackingInfo);
         }
     }
 }

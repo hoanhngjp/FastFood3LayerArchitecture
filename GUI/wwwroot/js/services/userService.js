@@ -1,86 +1,39 @@
 ﻿// File: /js/services/userService.js
+import { callApi } from './apiClient.js';
 
-const ME_ENDPOINT = 'https://localhost:7104/me';
-
-// ⭐️ Giả định: Token được lưu trong localStorage sau khi đăng nhập thành công.
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('accessToken');
-    // Nếu API của bạn dùng Cookie/Session thay vì Bearer Token,
-    // bạn cần loại bỏ dòng 'Authorization'. Hiện tại, giữ nguyên cấu trúc Bearer Token.
-    if (!token) {
-        console.warn("WARNING: Access token not found in localStorage. API call will likely fail with 401.");
-        return { 'Content-Type': 'application/json' };
-    }
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-    };
-};
+// Endpoint gốc của MeController
+const ME_ENDPOINT = '/me';
 
 // ----------------------------------------------------
-// PHẦN QUẢN LÝ ĐỊA CHỈ CÁ NHÂN (/me/addresses) - Đã có trong MeController.cs
+// QUẢN LÝ ĐỊA CHỈ (/me/addresses)
 // ----------------------------------------------------
 
-/**
- * [GET] Lấy danh sách địa chỉ (/me/addresses)
- */
 export async function getMyAddresses() {
-    const response = await fetch(`${ME_ENDPOINT}/addresses`, { method: 'GET', headers: getAuthHeaders() });
-
-    if (response.status === 401) throw new Error("Yêu cầu đăng nhập để xem địa chỉ.");
-    if (!response.ok) throw new Error("Không thể tải địa chỉ.");
-
-    return await response.json();
+    // callApi tự động xử lý Cookie và lỗi 401
+    return await callApi(`${ME_ENDPOINT}/addresses`, null, 'GET');
 }
 
-/**
- * [GET] Lấy địa chỉ theo ID (/me/addresses/{id})
- */
 export async function getMyAddressById(id) {
-    const response = await fetch(`${ME_ENDPOINT}/addresses/${id}`, { method: 'GET', headers: getAuthHeaders() });
-
-    if (!response.ok) throw new Error("Không tìm thấy địa chỉ.");
-    return await response.json();
+    return await callApi(`${ME_ENDPOINT}/addresses/${id}`, null, 'GET');
 }
 
-/**
- * [POST] Thêm địa chỉ mới (/me/addresses)
- */
 export async function addMyAddress(addressData) {
-    const response = await fetch(`${ME_ENDPOINT}/addresses`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(addressData)
-    });
-    if (response.status === 401) throw new Error("Yêu cầu đăng nhập.");
-    if (!response.ok) throw new Error("Thêm địa chỉ thất bại.");
-
-    return await response.json();
+    return await callApi(`${ME_ENDPOINT}/addresses`, addressData, 'POST');
 }
 
-/**
- * [PUT] Cập nhật địa chỉ (/me/addresses/{id})
- */
 export async function updateMyAddress(id, addressData) {
-    const response = await fetch(`${ME_ENDPOINT}/addresses/${id}`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(addressData)
-    });
-    if (response.status === 401) throw new Error("Yêu cầu đăng nhập.");
-    if (!response.ok) throw new Error("Cập nhật địa chỉ thất bại.");
-
-    return { success: true };
+    // API trả về 204 No Content nên callApi sẽ trả về {} hoặc null
+    return await callApi(`${ME_ENDPOINT}/addresses/${id}`, addressData, 'PUT');
 }
 
-/**
- * [DELETE] Xóa địa chỉ (/me/addresses/{id})
- */
 export async function deleteMyAddress(id) {
-    const response = await fetch(`${ME_ENDPOINT}/addresses/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-    });
-    if (response.status === 401) throw new Error("Yêu cầu đăng nhập.");
-    if (!response.ok) throw new Error("Xóa địa chỉ thất bại.");
+    return await callApi(`${ME_ENDPOINT}/addresses/${id}`, null, 'DELETE');
+}
+
+// ----------------------------------------------------
+// QUẢN LÝ ĐƠN HÀNG (/me/orders)
+// ----------------------------------------------------
+
+export async function getMyOrders() {
+    return await callApi(`${ME_ENDPOINT}/orders`, null, 'GET');
 }

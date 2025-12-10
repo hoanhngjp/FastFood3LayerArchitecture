@@ -13,6 +13,8 @@ namespace DTO.DTO
         public int AdrsID { get; set; }
 
         public int RestaurantID { get; set; }
+        public string? RestaurantName { get; set; }
+        public string? RestaurantAddress { get; set; }
 
         public DateTime OrderTime { get; set; }
 

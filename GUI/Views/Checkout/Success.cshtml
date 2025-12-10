@@ -1,7 +1,17 @@
 ﻿@{
-    // Sử dụng Layout chính đã tích hợp Bootstrap
     Layout = "_Layout";
-    ViewData["Title"] = "Đặt Hàng Thành Công";
+    // Lấy dữ liệu từ Controller truyền sang
+    bool isSuccess = ViewBag.IsSuccess ?? false;
+    int orderId = ViewBag.OrderId ?? 0;
+    string message = ViewBag.Message ?? "Không có thông tin giao dịch";
+
+    ViewData["Title"] = isSuccess ? "Đặt Hàng Thành Công" : "Thanh Toán Thất Bại";
+
+    // Màu sắc và Icon động
+    string colorClass = isSuccess ? "text-success" : "text-danger"; // Xanh hoặc Đỏ
+    string borderClass = isSuccess ? "border-warning" : "border-danger"; // Viền vàng hoặc Đỏ
+    string iconClass = isSuccess ? "bi-check-circle-fill text-warning" : "bi-x-circle-fill text-danger";
+    string titleText = isSuccess ? "ĐẶT HÀNG THÀNH CÔNG!" : "THANH TOÁN THẤT BẠI";
 }
 
 <style>
@@ -10,12 +20,21 @@
         width: 120px;
         height: 120px;
         border-radius: 50%;
-        background-color: #f0f0f0; /* Nền nhẹ */
+        background-color: #f0f0f0;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 auto 2rem;
-        border: 4px solid #ffc107; /* Viền màu chủ đạo */
+        border: 4px solid; /* Border dynamic */
+    }
+
+    /* Dynamic border color */
+    .border-warning {
+        border-color: #ffc107 !important;
+    }
+
+    .border-danger {
+        border-color: #dc3545 !important;
     }
 
     .success-content {
@@ -31,42 +50,75 @@
 <div class="container my-5">
     <div class="success-content text-center">
 
-        <div class="success-icon-container">
-            <i class="bi bi-check-circle-fill text-warning" style="font-size: 5rem;"></i>
+        <div class="success-icon-container @borderClass">
+            <i class="bi @iconClass" style="font-size: 5rem;"></i>
         </div>
 
-        <h1 class="fw-bold mb-3 text-success">ĐẶT HÀNG THÀNH CÔNG!</h1>
+        <h1 class="fw-bold mb-3 @colorClass">@titleText</h1>
 
-        <p class="lead text-muted">
-            Cảm ơn quý khách. Đơn hàng của bạn đã được tiếp nhận và sẽ được xử lý trong thời gian sớm nhất.
-        </p>
+        @if (isSuccess)
+        {
+            <p class="lead text-muted">
+                Cảm ơn quý khách. Đơn hàng của bạn đã được thanh toán thành công và đang được nhà hàng chuẩn bị.
+            </p>
+        }
+        else
+        {
+            <p class="lead text-muted">
+                Rất tiếc, quá trình thanh toán đã gặp sự cố hoặc bị hủy bỏ. Đơn hàng của bạn chưa được hoàn tất.
+            </p>
+            <div class="alert alert-danger mt-3">
+                <i class="bi bi-exclamation-triangle me-2"></i> Lỗi: @message
+            </div>
+        }
 
         <hr class="my-4">
 
-        <div class="row text-start small">
-            <div class="col-md-6 mb-3">
-                <p class="mb-1"><strong>Mã đơn hàng:</strong> <span class="fw-bold text-danger">#FDE12345</span></p>
-                <p class="mb-1"><strong>Ngày đặt:</strong> 12/11/2025</p>
-                <p class="mb-1"><strong>Email:</strong> cuong.nguyen@mail.com</p>
-            </div>
-            <div class="col-md-6 mb-3">
-                <p class="mb-1"><strong>Tổng tiền:</strong> <span class="fw-bold fs-5 text-warning">1.050.000₫</span></p>
-                <p class="mb-1"><strong>Thanh toán:</strong> Tiền mặt (COD)</p>
-                <p class="mb-1"><strong>Địa chỉ giao:</strong> 130 Xô Viết Nghệ Tĩnh</p>
+        <div class="row text-start small justify-content-center">
+            <div class="col-md-8">
+                <div class="bg-light p-3 rounded border">
+                    <p class="mb-2 d-flex justify-content-between">
+                        <strong>Mã đơn hàng:</strong>
+                        <span class="fw-bold text-primary">#@orderId</span>
+                    </p>
+                    <p class="mb-2 d-flex justify-content-between">
+                        <strong>Trạng thái:</strong>
+                        @if (isSuccess)
+                        {
+                            <span class="badge bg-success">Đã thanh toán</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Thất bại / Hủy</span>
+                        }
+                    </p>
+                    <p class="mb-0 d-flex justify-content-between">
+                        <strong>Thời gian:</strong>
+                        <span>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+                    </p>
+                </div>
             </div>
         </div>
 
-        <p class="mt-3 text-secondary">
-            Chúng tôi đã gửi email xác nhận chi tiết đơn hàng đến hòm thư của bạn.
-        </p>
-
         <div class="d-grid gap-2 d-md-block mt-4">
-            <a href="/" class="btn btn-warning btn-lg fw-bold me-md-2 text-dark">
-                <i class="bi bi-house-door-fill me-2"></i> Quay về Trang chủ
-            </a>
-            <a href="@Url.Action("Index", "Account")" class="btn btn-outline-secondary btn-lg">
-                <i class="bi bi-list-check me-2"></i> Xem Lịch sử Đơn hàng
-            </a>
+            @if (isSuccess)
+            {
+                <a asp-controller="Home" asp-action="Index" class="btn btn-warning btn-lg fw-bold me-md-2 text-dark">
+                    <i class="bi bi-house-door-fill me-2"></i> Quay về Trang chủ
+                </a>
+                <a asp-controller="Account" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-list-check me-2"></i> Xem Đơn hàng
+                </a>
+            }
+            else
+            {
+                <a href="/Checkout" class="btn btn-primary btn-lg fw-bold me-md-2">
+                    <i class="bi bi-arrow-repeat me-2"></i> Thử thanh toán lại
+                </a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-house-door-fill me-2"></i> Về trang chủ
+                </a>
+            }
         </div>
     </div>
 </div>

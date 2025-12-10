@@ -1,12 +1,13 @@
-﻿using DAT.UnitOfWork;
+﻿using DAT.Entity;
+using DAT.UnitOfWork;
 using DTO.DTO;
+using DTO.DTO.User;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DAT.Entity;
-using Microsoft.EntityFrameworkCore;
 
 namespace BUS.Services
 {
@@ -32,65 +33,69 @@ namespace BUS.Services
             return MapToDTO(user);
         }
 
-        public async Task<UserDTO> AddUserAsync(UserDTO userDto) // SỬA: Trả về UserDTO
+        public async Task<bool> AddUserAsync(CreateUser request) // SỬA: Trả về UserDTO
         {
-            var roleName = string.IsNullOrEmpty(userDto.RoleName) ? "customer" : userDto.RoleName;
+            var roleName = string.IsNullOrEmpty(request.RoleName) ? "customer" : request.RoleName;
             var role = (await _unitOfWork.UserRoles.FindAsync(r => r.RoleName == roleName)).FirstOrDefault();
 
             // SỬA: "Ném" lỗi 400 (Bad Request) nếu Role tào lao
             if (role == null)
                 throw new ArgumentException($"Role '{roleName}' not found.");
 
-            if (string.IsNullOrWhiteSpace(userDto.Password))
+            if (string.IsNullOrWhiteSpace(request.Password))
                 throw new ArgumentException("Password is required to create a user.");
 
             // Kiểm tra Email trùng (bạn đã làm ở AuthService, nên làm ở đây luôn)
-            if (await _unitOfWork.Users.GetByEmailAsync(userDto.Email) != null)
+            if (await _unitOfWork.Users.GetByEmailAsync(request.Email) != null)
                 throw new InvalidOperationException("Email already exists."); // Lỗi 409 Conflict
 
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
-            var user = new DAT.Entity.User
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            var user = new User
             {
-                FullName = userDto.FullName,
-                Email = userDto.Email,
+                FullName = request.FullName,
+                Email = request.Email,
                 PasswordHash = passwordHash,
-                DOB = userDto.DOB,
+                DOB = request.DOB,
                 RoleID = role.RoleID,
-                AvatarURL = userDto.AvatarURL,
+                AvatarURL = request.AvatarURL,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
             await _unitOfWork.Users.AddAsync(user);
-            await _unitOfWork.SaveChangesAsync();
+            return await _unitOfWork.SaveChangesAsync() > 0;
 
-            return MapToDTO(user);
         }
 
-        public async Task<bool> UpdateUserAsync(int id, UserDTO userDto) // SỬA: Thêm 'id' và trả về 'bool'
+        public async Task<bool> UpdateUserAsync(UpdateUser request)
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            var user = await _unitOfWork.Users.GetByIdAsync(request.UserID);
 
             // SỬA: "Ném" lỗi 404 (Not Found)
             if (user == null)
                 return false;
 
             // Cập nhật RoleID (nếu có)
-            if (!string.IsNullOrEmpty(userDto.RoleName) && user.UserRole?.RoleName != userDto.RoleName)
+            if (!string.IsNullOrEmpty(request.RoleName) && user.UserRole?.RoleName != request.RoleName)
             {
-                var role = (await _unitOfWork.UserRoles.FindAsync(r => r.RoleName == userDto.RoleName)).FirstOrDefault();
+                var role = (await _unitOfWork.UserRoles.FindAsync(r => r.RoleName == request.RoleName)).FirstOrDefault();
 
                 // SỬA: "Ném" lỗi 400 (Bad Request) nếu Role tào lao
                 if (role == null)
-                    throw new ArgumentException($"Role '{userDto.RoleName}' not found.");
+                    throw new ArgumentException($"Role '{request.RoleName}' not found.");
                 user.RoleID = role.RoleID;
             }
 
-            user.FullName = userDto.FullName;
-            user.Email = userDto.Email; // CẨN THẬN: Đổi email có thể cần xác thực lại
-            user.DOB = userDto.DOB;
-            user.AvatarURL = userDto.AvatarURL;
+            user.FullName = request.FullName;
+            user.Email = request.Email;
+            user.DOB = request.DOB;
+            user.AvatarURL = request.AvatarURL;
             user.UpdatedAt = DateTime.UtcNow;
+
+            if (!string.IsNullOrEmpty(request.Password))
+            {
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            }
 
             _unitOfWork.Users.Update(user);
             await _unitOfWork.SaveChangesAsync();
@@ -106,7 +111,57 @@ namespace BUS.Services
             await _unitOfWork.SaveChangesAsync();
             return true;
         }
-        private UserDTO MapToDTO(DAT.Entity.User u)
+        public async Task<PagedResult<UserDTO>> GetUsersPagingAsync(UserFilterRequest request)
+        {
+            // 1. Khởi tạo Query (chưa execute)
+            // Lưu ý: Cần đảm bảo Repository có trả về IQueryable. 
+            // Nếu Repository của bạn chỉ trả về IEnumerable (List), ta tạm thời phải load hết rồi lọc (không tối ưu nhưng chạy được).
+            // Giả sử UnitOfWork.Users.GetAllWithRolesAsync() trả về List.
+
+            var allUsers = await _unitOfWork.Users.GetAllWithRolesAsync();
+            var query = allUsers.AsQueryable();
+
+            // 2. Lọc theo Keyword
+            if (!string.IsNullOrEmpty(request.Keyword))
+            {
+                var key = request.Keyword.ToLower();
+                query = query.Where(u => u.FullName.ToLower().Contains(key) ||
+                                         u.Email.ToLower().Contains(key));
+            }
+
+            // 3. Lọc theo Role
+            if (!string.IsNullOrEmpty(request.Role) && request.Role != "All")
+            {
+                query = query.Where(u => u.UserRole.RoleName == request.Role);
+            }
+
+            // 4. Tính toán phân trang
+            int totalCount = query.Count();
+            var items = query
+                .Skip((request.PageIndex - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(MapToDTO)
+                .ToList();
+
+            return new PagedResult<UserDTO>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageIndex = request.PageIndex,
+                PageSize = request.PageSize
+            };
+        }
+
+        public async Task<IEnumerable<RoleDTO>> GetAllRolesAsync()
+        {
+            var roles = await _unitOfWork.UserRoles.GetAllAsync();
+            return roles.Select(r => new RoleDTO
+            {
+                RoleID = r.RoleID,
+                RoleName = r.RoleName
+            });
+        }
+        private UserDTO MapToDTO(User u)
         {
             return new UserDTO
             {

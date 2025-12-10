@@ -1,0 +1,123 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Drone";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex gap-2">
+        <div class="input-group" style="width: 300px;">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+            <input type="text" id="searchKeyword" class="form-control border-start-0 ps-0" placeholder="Tìm Model, Serial Number...">
+        </div>
+
+        <select id="filterStatus" class="form-select" style="width: 170px;">
+            <option value="">-- Tất cả trạng thái --</option>
+            <option value="1">Idle (Sẵn sàng)</option>
+            <option value="2">Busy (Bận)</option>
+            <option value="3">Maintenance (Bảo trì)</option>
+        </select>
+
+        <select id="pageSizeSelect" class="form-select" style="width: 130px;">
+            <option value="5">Hiển thị 5</option>
+            <option value="10" selected>Hiển thị 10</option>
+            <option value="20">Hiển thị 20</option>
+        </select>
+    </div>
+
+    <button class="btn btn-primary shadow-sm" onclick="openDroneModal()">
+        <i class="bi bi-plus-lg"></i> Thêm Drone
+    </button>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4">Model & Serial</th>
+                    <th>Trạm (Vị trí)</th>
+                    <th>Tải trọng (Max)</th>
+                    <th>Pin</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end pe-4">Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="droneTableBody">
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+        <span class="text-muted small" id="pagingInfo">...</span>
+        <nav>
+            <ul class="pagination pagination-sm mb-0 justify-content-end" id="paginationControls"></ul>
+        </nav>
+    </div>
+</div>
+
+<div class="modal fade" id="droneModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="droneModalTitle">Thêm Drone Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="droneForm">
+                    <input type="hidden" id="droneId">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Model <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="droneModel" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Số Serial <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="droneSerial" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tải trọng tối đa (kg)</label>
+                            <input type="number" class="form-control" id="droneMaxLoad" step="0.1" min="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Thuộc trạm <span class="text-danger">*</span></label>
+                            <select class="form-select" id="droneStation" required>
+                                <option value="">Đang tải...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="editFields" class="p-3 bg-light rounded border mt-2" style="display:none;">
+                        <h6 class="text-muted small mb-3 text-uppercase fw-bold">Cập nhật trạng thái</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Mức Pin (%)</label>
+                                <input type="number" class="form-control" id="droneBattery" min="0" max="100">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Trạng thái</label>
+                                <select class="form-select" id="droneStatus">
+                                    <option value="1">Idle (Rảnh)</option>
+                                    <option value="2">Charging (Đang sạc)</option>
+                                    <option value="3">Delivering (Đang giao)</option>
+                                    <option value="4">Busy (Bận)</option>
+                                    <option value="9">Maintenance (Bảo trì)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="saveDrone()">Lưu thông tin</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="module" src="~/js/admin/pages/drone.js"></script>
+}

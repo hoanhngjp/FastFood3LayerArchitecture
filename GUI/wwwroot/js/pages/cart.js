@@ -1,7 +1,7 @@
-﻿// /js/pages/cart.js
+﻿// GUI/wwwroot/js/pages/cart.js
 import { getCart, updateItemQuantity, removeItem, calculateSubtotal, formatCurrency } from '../services/cartService.js';
 
-// Khai báo DOM elements
+// DOM Elements
 const cartItemsListEl = document.querySelector('.cart-items-list');
 const summarySubtotalEl = document.getElementById('summary-subtotal');
 const summaryTotalItemsEl = document.getElementById('summary-total-items');
@@ -15,63 +15,83 @@ const DEFAULT_SHIPPING_FEE = 30000;
 const DEFAULT_DISCOUNT = 0;
 
 /**
- * Cập nhật Tóm tắt Đơn hàng
+ * Cập nhật phần tổng tiền
  */
 function updateCartSummary(cart) {
     const subtotal = calculateSubtotal(cart);
-    const shippingFee = DEFAULT_SHIPPING_FEE;
+    // Chỉ tính ship nếu có hàng
+    const shippingFee = cart.length > 0 ? DEFAULT_SHIPPING_FEE : 0;
     const discount = DEFAULT_DISCOUNT;
-
     const grandTotal = subtotal + shippingFee - discount;
     const totalItems = cart.reduce((count, item) => count + item.quantity, 0);
 
-    // Cập nhật DOM Summary (Tất cả đều dùng formatCurrency cho VNĐ)
-    summarySubtotalEl.textContent = formatCurrency(subtotal);
-    summaryShippingFeeEl.textContent = formatCurrency(shippingFee);
-    summaryDiscountEl.textContent = formatCurrency(discount);
-    summaryGrandTotalEl.textContent = formatCurrency(grandTotal);
+    // Cập nhật text hiển thị
+    if (summarySubtotalEl) summarySubtotalEl.textContent = formatCurrency(subtotal);
+    if (summaryShippingFeeEl) summaryShippingFeeEl.textContent = formatCurrency(shippingFee);
+    if (summaryDiscountEl) summaryDiscountEl.textContent = formatCurrency(discount);
+    if (summaryGrandTotalEl) summaryGrandTotalEl.textContent = formatCurrency(grandTotal);
+    if (summaryTotalItemsEl) summaryTotalItemsEl.textContent = totalItems;
 
-    summaryTotalItemsEl.textContent = totalItems;
-    cartTitleSpanEl.textContent = `(${totalItems} món)`;
+    // Cập nhật tiêu đề số lượng món
+    const titleCountEl = document.getElementById('cart-title-count') || cartTitleSpanEl;
+    if (titleCountEl) titleCountEl.textContent = `(${totalItems} món)`;
 
+    // --- LOGIC XỬ LÝ NÚT CHECKOUT ---
     if (btnCheckoutEl) {
         const isEmpty = cart.length === 0;
-        btnCheckoutEl.disabled = isEmpty;
-        btnCheckoutEl.style.opacity = isEmpty ? 0.6 : 1;
-        btnCheckoutEl.textContent = isEmpty ? 'Giỏ hàng trống' : 'Tiến hành Thanh toán';
+
+        if (isEmpty) {
+            // Trường hợp giỏ hàng trống
+            btnCheckoutEl.classList.add('disabled'); // Bootstrap class disable style
+            btnCheckoutEl.setAttribute('aria-disabled', 'true'); // Accessibility
+            btnCheckoutEl.setAttribute('href', '#'); // Ngăn link hoạt động
+
+            // Style bổ sung để chắc chắn không click được
+            btnCheckoutEl.style.pointerEvents = 'none';
+            btnCheckoutEl.style.opacity = '0.6';
+            btnCheckoutEl.textContent = 'Giỏ hàng trống';
+        } else {
+            // Trường hợp có hàng
+            btnCheckoutEl.classList.remove('disabled');
+            btnCheckoutEl.setAttribute('aria-disabled', 'false');
+            btnCheckoutEl.setAttribute('href', '/Checkout'); // Gán link checkout đúng
+
+            // Khôi phục style
+            btnCheckoutEl.style.pointerEvents = 'auto';
+            btnCheckoutEl.style.opacity = '1';
+            btnCheckoutEl.innerHTML = '<i class="bi bi-cart-check me-2"></i> Tiến hành Thanh toán';
+        }
     }
 }
-
-
 /**
- * Tạo HTML cho một món ăn trong giỏ hàng
+ * Render HTML từng món
  */
 function createCartItemHTML(item) {
     const itemTotal = item.price * item.quantity;
-    const imageSrc = item.imageUrl && item.imageUrl.startsWith('/') ? item.imageUrl : `/${item.imageUrl || 'images/food-menu-default.png'}`;
+    // Kiểm tra ảnh, nếu null dùng ảnh default
+    const imageSrc = item.imageUrl ? item.imageUrl : '/images/food-menu-default.png';
 
     return `
-        <div class="row align-items-center mb-3 p-3 border-bottom cart-item" data-food-id="${item.id}">
-            <div class="col-2 col-md-1">
-                <img src="${imageSrc}" alt="${item.name}" class="img-fluid rounded" style="max-height: 70px; object-fit: cover;">
+        <div class="row align-items-center mb-3 p-3 border-bottom cart-item">
+            <div class="col-3 col-md-2">
+                <img src="${imageSrc}" alt="${item.name}" class="img-fluid rounded" style="width: 100%; aspect-ratio: 1/1; object-fit: cover;">
             </div>
-            <div class="col-5 col-md-5">
-                <h5 class="mb-0 fw-bold">${item.name}</h5>
-                <small class="text-muted">${item.category}</small>
+            <div class="col-9 col-md-4">
+                <h6 class="mb-1 fw-bold">${item.name}</h6>
                 <p class="mb-0 text-danger fw-bold">${formatCurrency(item.price)}</p>
             </div>
-            <div class="col-3 col-md-3">
-                <div class="quantity-control input-group input-group-sm" style="width: 120px;">
-                    <button class="btn btn-outline-warning btn-sm qty-btn-minus" type="button" data-id="${item.id}">-</button>
-                    <input type="number" value="${item.quantity}" min="1" class="form-control text-center qty-input" data-id="${item.id}" aria-label="Số lượng">
-                    <button class="btn btn-outline-warning btn-sm qty-btn-plus" type="button" data-id="${item.id}">+</button>
+            <div class="col-6 col-md-3 mt-3 mt-md-0">
+                <div class="input-group input-group-sm quantity-control" style="max-width: 120px;">
+                    <button class="btn btn-outline-secondary qty-btn-minus" type="button" data-id="${item.id}">-</button>
+                    <input type="number" readonly value="${item.quantity}" class="form-control text-center qty-input" style="background-color: #fff;">
+                    <button class="btn btn-outline-secondary qty-btn-plus" type="button" data-id="${item.id}">+</button>
                 </div>
             </div>
-            <div class="col-2 col-md-2 text-end fw-bold text-dark-orange">
+            <div class="col-4 col-md-2 mt-3 mt-md-0 text-end fw-bold">
                 ${formatCurrency(itemTotal)}
             </div>
-            <div class="col-1 col-md-1 text-end">
-                <button class="btn btn-sm btn-outline-danger remove-item-btn" data-id="${item.id}" title="Xóa món">
+            <div class="col-2 col-md-1 mt-3 mt-md-0 text-end">
+                <button class="btn btn-sm btn-outline-danger remove-item-btn" data-id="${item.id}">
                     <i class="bi bi-trash"></i>
                 </button>
             </div>
@@ -80,117 +100,97 @@ function createCartItemHTML(item) {
 }
 
 /**
- * Tải và hiển thị toàn bộ giỏ hàng
+ * Render toàn bộ trang
  */
-export function renderCart() {
-    const cart = getCart();
-    cartItemsListEl.innerHTML = '';
+export async function renderCart() {
+    if (!cartItemsListEl) return; // Không phải trang cart thì return
+
+    // Hiển thị loading nhẹ hoặc giữ nguyên UI cũ
+    // cartItemsListEl.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-warning"></div></div>';
+
+    const cart = await getCart();
 
     if (cart.length === 0) {
         cartItemsListEl.innerHTML = `
             <div class="text-center p-5">
-                <i class="bi bi-cart-x display-4 text-muted mb-3"></i>
-                <p class="fs-4 text-muted">Giỏ hàng của bạn đang trống!</p>
-                <a href="/#food-menu" class="btn btn-warning fw-bold mt-3">Tiếp tục chọn món</a>
+                <i class="bi bi-cart-x display-1 text-muted"></i>
+                <p class="fs-5 text-muted mt-3">Giỏ hàng của bạn đang trống!</p>
+                <a href="/#food-menu" class="btn btn-warning text-white fw-bold mt-3">Tiếp tục mua sắm</a>
             </div>
         `;
     } else {
-        const itemsHTML = cart.map(createCartItemHTML).join('');
-        cartItemsListEl.innerHTML = itemsHTML;
-        setupCartEvents();
+        cartItemsListEl.innerHTML = cart.map(createCartItemHTML).join('');
     }
-
     updateCartSummary(cart);
 }
 
-
 /**
- * Thiết lập sự kiện cho các nút Tăng, Giảm, Xóa (click) và ô input số lượng (change)
+ * Setup Events - CHỈ GỌI 1 LẦN trong DOMContentLoaded
  */
 function setupCartEvents() {
-    // 1. Xử lý sự kiện CLICK cho Tăng (+), Giảm (-), Xóa (Sử dụng Event Delegation)
-    // Đảm bảo chỉ thêm listener CLICK một lần duy nhất vào cartItemsListEl
-    if (!cartItemsListEl.dataset.clickListenerAdded) {
-        cartItemsListEl.addEventListener('click', (e) => {
-            const target = e.target.closest('button');
-            if (!target) return;
+    if (!cartItemsListEl) return;
 
-            const foodId = parseInt(target.dataset.id);
-            if (isNaN(foodId)) return;
+    // Xử lý Click (Event Delegation)
+    cartItemsListEl.addEventListener('click', async (e) => {
+        const target = e.target.closest('button');
+        if (!target) return;
 
-            let currentCart = getCart();
-            const itemIndex = currentCart.findIndex(item => item.id === foodId);
-            if (itemIndex === -1) return;
+        const foodId = parseInt(target.dataset.id);
+        if (!foodId) return;
 
-            let shouldRender = false;
-            let currentQuantity = currentCart[itemIndex].quantity;
+        // Vô hiệu hóa nút tạm thời để tránh spam click
+        target.disabled = true;
+
+        try {
+            // Lấy giỏ hàng mới nhất để biết số lượng hiện tại
+            const currentCart = await getCart();
+            const item = currentCart.find(x => x.id === foodId);
+
+            if (!item && !target.classList.contains('remove-item-btn')) {
+                // Món không tồn tại (có thể bị xóa ở tab khác)
+                await renderCart();
+                return;
+            }
 
             if (target.classList.contains('qty-btn-plus')) {
-                // Tăng số lượng
-                updateItemQuantity(foodId, currentQuantity + 1);
-                shouldRender = true;
-            } else if (target.classList.contains('qty-btn-minus')) {
-                // Giảm số lượng (tối thiểu là 1)
-                if (currentQuantity > 1) {
-                    updateItemQuantity(foodId, currentQuantity - 1);
-                    shouldRender = true;
+                await updateItemQuantity(foodId, item.quantity + 1);
+            }
+            else if (target.classList.contains('qty-btn-minus')) {
+                if (item.quantity > 1) {
+                    await updateItemQuantity(foodId, item.quantity - 1);
+                } else {
+                    // Nếu số lượng là 1 mà bấm trừ -> hỏi xóa
+                    if (confirm('Bạn muốn xóa món này khỏi giỏ hàng?')) {
+                        await removeItem(foodId);
+                    }
                 }
-            } else if (target.classList.contains('remove-item-btn')) {
-                // Xóa món
-                if (confirm('Bạn có chắc chắn muốn xóa món ăn này khỏi giỏ hàng?')) {
-                    removeItem(foodId);
-                    shouldRender = true;
+            }
+            else if (target.classList.contains('remove-item-btn')) {
+                if (confirm('Xóa món ăn này?')) {
+                    await removeItem(foodId);
                 }
             }
 
-            // Render lại giỏ hàng nếu có thay đổi
-            if (shouldRender) {
-                renderCart();
-            }
-        });
-        // Đánh dấu đã thêm listener CLICK
-        cartItemsListEl.dataset.clickListenerAdded = true;
-    }
+            // LƯU Ý: Không cần gọi renderCart() ở đây nữa
+            // Vì các hàm update/remove ở service đã gọi notifyCartUpdate()
+            // Và chúng ta đã lắng nghe sự kiện đó ở dưới.
 
-
-    // 2. Xử lý sự kiện CHANGE cho Input Số lượng (qty-input)
-    // Dùng Event Delegation và đảm bảo chỉ thêm listener CHANGE một lần duy nhất
-    if (!cartItemsListEl.dataset.changeListenerAdded) {
-        cartItemsListEl.addEventListener('change', (e) => {
-            const target = e.target;
-            // Kiểm tra xem phần tử bị thay đổi có phải là input số lượng không
-            if (target.classList.contains('qty-input')) {
-                const foodId = parseInt(target.dataset.id);
-                let newQuantity = parseInt(target.value);
-
-                if (isNaN(foodId)) return;
-
-                // Kiểm tra và đảm bảo số lượng >= 1
-                if (isNaN(newQuantity) || newQuantity < 1) {
-                    newQuantity = 1;
-                }
-
-                // Cập nhật giỏ hàng
-                updateItemQuantity(foodId, newQuantity);
-                // Render lại để đồng bộ giao diện và cập nhật tổng tiền
-                renderCart();
-
-                // Cập nhật lại giá trị trên input (đề phòng người dùng nhập 0 hoặc giá trị không hợp lệ)
-                // Cần làm điều này sau khi renderCart() đã hoàn tất
-                const currentItemInput = cartItemsListEl.querySelector(`.qty-input[data-id="${foodId}"]`);
-                if (currentItemInput) {
-                    currentItemInput.value = newQuantity;
-                }
-            }
-        });
-        // Đánh dấu đã thêm listener CHANGE
-        cartItemsListEl.dataset.changeListenerAdded = true;
-    }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            target.disabled = false;
+        }
+    });
 }
 
-
+// Khởi tạo
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Render lần đầu
     renderCart();
-    // Lắng nghe sự kiện tùy chỉnh 'cartUpdated' để render lại giỏ hàng khi có thay đổi từ nơi khác
+
+    // 2. Setup sự kiện click (chỉ 1 lần)
+    setupCartEvents();
+
+    // 3. Lắng nghe sự kiện update từ Service (khi thêm/sửa/xóa xong)
     document.addEventListener('cartUpdated', renderCart);
 });

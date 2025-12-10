@@ -1,0 +1,128 @@
+﻿@{
+    ViewData["Title"] = "Thông tin quán";
+    Layout = "~/Views/Shared/_LayoutManager.cshtml";
+}
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        /* Đảm bảo bản đồ có chiều cao cụ thể */
+        #map {
+            height: 300px;
+            width: 100%;
+            z-index: 1; /* Tránh đè lên các menu dropdown nếu có */
+        }
+    </style>
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Thông tin Chi nhánh</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="button" class="btn btn-sm btn-outline-primary" id="btn-edit-info">
+            <i class="bi bi-pencil-square"></i> Cập nhật thông tin
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 text-primary"><i class="bi bi-info-circle me-2"></i>Chi tiết hoạt động</h5>
+            </div>
+            <div class="card-body">
+                <form id="restaurant-info-form">
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label fw-bold text-secondary">Tên chi nhánh</label>
+                        <div class="col-sm-9">
+                            <input type="text" id="res-name" readonly class="form-control-plaintext fw-bold fs-5 text-dark" value="Đang tải dữ liệu...">
+                        </div>
+                    </div>
+                    <hr class="my-2">
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label fw-bold text-secondary">Địa chỉ</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-geo-alt text-danger"></i></span>
+                                <input type="text" id="res-address" readonly class="form-control-plaintext bg-white ps-2" value="Đang tải...">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label fw-bold text-secondary">Hotline</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-telephone text-success"></i></span>
+                                <input type="text" id="res-phone" readonly class="form-control-plaintext bg-white ps-2" value="Đang tải...">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label fw-bold text-secondary">Giờ mở cửa</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-clock text-warning"></i></span>
+                                <input type="text" id="res-hours" readonly class="form-control-plaintext bg-white ps-2" value="--:--">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm text-center mb-3">
+            <div class="card-header bg-white border-bottom-0 pt-3 pb-0 text-start">
+                <h5 class="card-title text-muted mb-0"><i class="bi bi-map"></i> Vị trí bản đồ</h5>
+            </div>
+            <div class="card-body p-2">
+                <div id="map" class="rounded border bg-light"></div>
+
+                <p class="card-text text-start small text-muted mt-2 px-2">
+                    <i class="bi bi-info-circle"></i> Vị trí được xác định bởi tọa độ GPS trong hệ thống.
+                </p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-secondary" id="status-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-circle-fill text-secondary fs-1" id="status-icon"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5 class="mb-0" id="status-badge">Đang kiểm tra...</h5>
+                        <small class="text-muted" id="status-text">...</small>
+                    </div>
+                </div>
+                <div class="d-grid">
+                    <button class="btn btn-outline-secondary btn-sm" id="btn-toggle-status">
+                        <i class="bi bi-power"></i> Đóng/Mở cửa hàng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script type="module" src="~/js/manager/pages/restaurant.js"></script>
+
+    <script type="module">
+        import { toggleRestaurantStatus } from '/js/manager/services/managerService.js';
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnToggle = document.getElementById('btn-toggle-status');
+            const currentResId = localStorage.getItem('currentRestaurantId');
+            if(btnToggle && currentResId) {
+                btnToggle.addEventListener('click', async () => {
+                    if(!confirm("Bạn có chắc muốn thay đổi trạng thái hoạt động?")) return;
+                    try {
+                        const statusBadge = document.getElementById('status-badge');
+                        const isCurrentlyOpen = statusBadge && statusBadge.textContent.includes('hoạt động');
+                        await toggleRestaurantStatus(currentResId, !isCurrentlyOpen);
+                        window.location.reload();
+                    } catch (e) { alert("Lỗi: " + e.message); }
+                });
+            }
+        });
+    </script>

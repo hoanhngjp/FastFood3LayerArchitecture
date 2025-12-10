@@ -1,0 +1,17 @@
+version: "2"
+authtoken: 34rITspWl8dCaZ1fvryGATesOT9_7ALVQCHAqtxUWUMzBUb8j
+
+tunnels:
+  # WebAPI (QUAN TRỌNG: Giữ cái này cố định để VNPay không bị lỗi)
+  webapi:
+    addr: https://localhost:7104
+    proto: http
+    host_header: localhost:7104
+    domain: idiocratical-linh-unreprehensibly.ngrok-free.dev
+
+  # GUI (Chấp nhận link ngẫu nhiên thay đổi mỗi lần chạy)
+  gui:
+    addr: https://localhost:7105
+    proto: http
+    host_header: localhost:7105
+    # Không set domain ở đây

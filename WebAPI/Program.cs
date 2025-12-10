@@ -2,7 +2,10 @@
 using BUS.Services.AddressService;
 using BUS.Services.CartService;
 using BUS.Services.DashboardService;
+using BUS.Services.DeliveryService;
 using BUS.Services.DroneService;
+using BUS.Services.DroneStationService;
+using BUS.Services.FileStorageService;
 using BUS.Services.PaymentService;
 using BUS.Services.RestaurantService;
 using DAT;
@@ -12,43 +15,48 @@ using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Text;
 using WebAPI.Workers;
 
+DotNetEnv.Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
-Env.Load();
-
+// --- 1. Load Cấu hình ---
 builder.Configuration["ConnectionStrings:DefaultConnection"] = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 builder.Configuration["Jwt:Key"] = Environment.GetEnvironmentVariable("JWT_SECRET");
-
 builder.Configuration["Vnpay:TmnCode"] = Environment.GetEnvironmentVariable("VNPAY_TMNCODE");
-builder.Configuration["Vnpay:HashSecret"] = Environment.GetEnvironmentVariable("VNPAY_HASHSECRET");
+builder.Configuration["Vnpay:HashSecret"] = Environment.GetEnvironmentVariable("VNPAY_HASHSECRET")?.Trim();
 builder.Configuration["Vnpay:BaseUrl"] = Environment.GetEnvironmentVariable("VNPAY_URL");
+builder.Configuration["Vnpay:PaymentBackReturnUrl"] = Environment.GetEnvironmentVariable("VNPAY_RETURN_URL");
 
 var config = builder.Configuration;
 
-// Add services to the container.
-
+// --- 2. Add Services ---
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// Đăng ký Hosted Service
 builder.Services.AddHostedService<DroneSimulatorWorker>();
 
-// CORS policy
+// QUAN TRỌNG: Cấu hình CORS mở toàn bộ
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        policy => policy
-            .WithOrigins("https://localhost:7105")//New
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());//New
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.SetIsOriginAllowed(origin => true) // Cho phép mọi Origin (IP nào cũng được)
+              .AllowCredentials()                 // QUAN TRỌNG: Cho phép nhận Cookie
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
+// QUAN TRỌNG: Cấu hình Cookie Policy cho HTTP
+// Giúp trình duyệt chấp nhận Cookie khi không có HTTPS
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.CheckConsentNeeded = context => false;
+    options.MinimumSameSitePolicy = SameSiteMode.Lax; // Lax hoạt động tốt với HTTP
+    options.Secure = CookieSecurePolicy.SameAsRequest; // Nếu request là HTTP thì Cookie cũng là HTTP
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -56,14 +64,19 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddDistributedMemoryCache();
 
+// Cấu hình Session
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); 
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    // Quan trọng: Để False hoặc SameAsRequest khi chạy HTTP
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
 
-// ĐĂNG KÝ CÁC SERVICES
+builder.Services.AddHttpContextAccessor();
+
+// --- 3. Đăng ký Services (Dependency Injection) ---
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -75,48 +88,47 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
-builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IRestaurantDashboardService, RestaurantDashboardService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IDroneService, DroneService>();
+builder.Services.AddScoped<ISystemDashboardService, SystemDashboardService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<IDroneStationService, DroneStationService>();
+builder.Services.AddScoped<IDeliveryService, DeliveryService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
-builder.Services.AddHttpContextAccessor();
-// Thêm dịch vụ "Xác thực"
+
+
+// --- 4. Cấu hình JWT ---
 builder.Services.AddAuthentication(options =>
 {
-    // Đặt "Bearer" làm chuẩn
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-// Cấu hình Handler của Bearer
 .AddJwtBearer(options =>
 {
-    // A. Cấu hình "Khóa" 
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"])),
 
-        ValidateIssuer = true,
-        ValidIssuer = config["Jwt:Issuer"],
+        // Tắt check Issuer/Audience để tránh lỗi khi đổi từ localhost sang IP
+        ValidateIssuer = false,
+        ValidateAudience = false,
 
-        ValidateAudience = true,
-        ValidAudience = config["Jwt:Audience"],
-
-        ClockSkew = TimeSpan.Zero // Chuẩn!
+        ClockSkew = TimeSpan.Zero
     };
 
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
         {
-            // Thử lấy token từ cookie trước
-            string? token = context.Request.Cookies["access_token"];
-
+            // Lấy token từ Cookie "access_token"
+            var token = context.Request.Cookies["access_token"];
             if (!string.IsNullOrEmpty(token))
             {
                 context.Token = token;
             }
-
             return Task.CompletedTask;
         }
     };
@@ -124,26 +136,31 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// --- 5. Configure Pipeline (Middleware) ---
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// ❌ COMMENT DÒNG NÀY: Để không ép chuyển sang HTTPS
+// app.UseHttpsRedirection(); 
 
-app.UseHsts();
+// ❌ COMMENT DÒNG NÀY: HSTS ép trình duyệt ghi nhớ HTTPS -> Gây lỗi trên LAN HTTP
+// app.UseHsts(); 
 
 app.UseStaticFiles();
 
+// Kích hoạt Cookie Policy (Đặt trước Authentication)
+app.UseCookiePolicy();
+
+// Kích hoạt CORS (Đặt trước Auth)
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.UseSession();

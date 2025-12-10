@@ -1,4 +1,5 @@
 ﻿using DTO.DTO;
+using DTO.DTO.Category;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,8 @@ namespace BUS.Services
     {
         Task<IEnumerable<CategoryDTO>> GetAllAsync();
         Task<CategoryDTO?> GetByIdAsync(int id);
-        Task<CategoryDTO> AddAsync(CategoryDTO dto);
-        Task<bool> UpdateAsync(int id, CategoryDTO dto);
+        Task<CategoryDTO> AddAsync(CreateCategoryDTO dto);
+        Task<bool> UpdateAsync(int id, UpdateCategoryDTO dto);
         Task<bool> DeleteAsync(int id);
     }
 }

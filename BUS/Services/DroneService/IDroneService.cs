@@ -15,5 +15,7 @@ namespace BUS.Services.DroneService
         Task<bool> DeleteAsync(int id);
         Task<bool> UpdateStatusAsync(int droneId, string statusName);
         Task<string> AssignOrderAsync(AssignDroneDTO dto);
+        Task<bool> UpdateAsAdminAsync(int id, UpdateDroneDTO dto);
+        Task<IEnumerable<DroneStationDTO>> GetAllStationsAsync(); // Lấy danh sách trạm
     }
 }

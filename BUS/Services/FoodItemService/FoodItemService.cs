@@ -2,6 +2,7 @@
 using DAT.Entity;
 using DAT.UnitOfWork;
 using DTO.DTO;
+using DTO.DTO.FoodItem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,21 +18,21 @@ public class FoodItemService : IFoodItemService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<IEnumerable<FoodItemDTO>> GetAllAsync()
+    public async Task<IEnumerable<FoodItemResponseDTO>> GetAllAsync()
     {
         var items = await _unitOfWork.FoodItems.GetAllWithDetailsAsync();
         // CẢI TIẾN: Dùng hàm MapToDTO
         return items.Select(MapToDTO);
     }
 
-    public async Task<IEnumerable<FoodItemDTO>> GetFoodsByCategoryAsync(int categoryId)
+    public async Task<IEnumerable<FoodItemResponseDTO>> GetFoodsByCategoryAsync(int categoryId)
     {
         var items = await _unitOfWork.FoodItems.GetByCategoryWithDetailsAsync(categoryId);
 
         return items.Select(MapToDTO);
     }
 
-    public async Task<FoodItemDTO?> GetByIdAsync(int id)
+    public async Task<FoodItemResponseDTO?> GetByIdAsync(int id)
     {
         var f = await _unitOfWork.FoodItems.GetByIdWithDetailsAsync(id);
         if (f == null) return null;
@@ -39,9 +40,9 @@ public class FoodItemService : IFoodItemService
         return MapToDTO(f);
     }
 
-    public async Task AddAsync(FoodItemDTO dto)
+    public async Task<FoodItemResponseDTO> AddAsync(CreateFoodItemDTO dto)
     {
-        var entity = new DAT.Entity.FoodItem
+        var entity = new FoodItem
         {
             FoodName = dto.FoodName,
             Description = dto.Description,
@@ -54,10 +55,12 @@ public class FoodItemService : IFoodItemService
         };
         await _unitOfWork.FoodItems.AddAsync(entity);
         await _unitOfWork.SaveChangesAsync();
+
+        return MapToDTO(entity);
     }
-    public async Task<bool> UpdateAsync(FoodItemDTO dto)
+    public async Task<bool> UpdateAsync(int id, UpdateFoodItemDTO dto)
     {
-        var entity = await _unitOfWork.FoodItems.GetByIdAsync(dto.FoodId);
+        var entity = await _unitOfWork.FoodItems.GetByIdAsync(id);
 
         if (entity == null)
             return false;
@@ -87,9 +90,9 @@ public class FoodItemService : IFoodItemService
         return true;
     }
 
-    private FoodItemDTO MapToDTO(FoodItem f)
+    private FoodItemResponseDTO MapToDTO(FoodItem f)
     {
-        return new FoodItemDTO
+        return new FoodItemResponseDTO
         {
             FoodId = f.FoodID,
             FoodName = f.FoodName,
