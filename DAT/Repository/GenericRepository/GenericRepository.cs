@@ -64,5 +64,9 @@ namespace DAT.Repository
 
         public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null, CancellationToken ct = default)
             => predicate == null ? await _dbSet.CountAsync(ct) : await _dbSet.CountAsync(predicate, ct);
+        public IQueryable<T> GetQuery()
+        {
+            return _dbSet.AsQueryable();
+        }
     }
 }

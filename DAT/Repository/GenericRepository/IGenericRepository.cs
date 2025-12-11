@@ -26,5 +26,6 @@ namespace DAT.Repository
             CancellationToken ct = default);
 
         Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null, CancellationToken ct = default);
+        IQueryable<T> GetQuery();
     }
 }

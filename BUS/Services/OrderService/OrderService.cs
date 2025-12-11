@@ -46,6 +46,7 @@ namespace BUS.Services
         }
         public async Task<OrderCreationResponseDTO> CreateAsync(OrderDTO dto, int userIdFromToken)
         {
+            // 1. Kiểm tra Status
             var pendingStatus = (await _unitOfWork.Repository<OrderStatus>()
                                 .FindAsync(s => s.StatusName == "Pending"))
                                 .FirstOrDefault();
@@ -55,6 +56,7 @@ namespace BUS.Services
                 throw new InvalidOperationException("LỖI HỆ THỐNG: Không tìm thấy 'Pending' Status. Hãy seed CSDL.");
             }
 
+            // 2. Tính tổng tiền
             int total = 0;
             foreach (var item in dto.Items)
             {
@@ -67,6 +69,7 @@ namespace BUS.Services
                 total += food.Price * item.Quantity;
             }
 
+            // 3. Tạo Entity Order
             var order = new Order
             {
                 UserID = userIdFromToken,
@@ -86,8 +89,24 @@ namespace BUS.Services
             };
 
             await _unitOfWork.Orders.AddAsync(order);
+
+            // --- [CẬP NHẬT: TĂNG ORDER COUNT CHO USER] ---
+            // Lấy thông tin User hiện tại
+            var user = await _unitOfWork.Repository<User>().GetByIdAsync(userIdFromToken);
+            if (user != null)
+            {
+                // Tăng số lượng đơn hàng
+                user.OrderCount++;
+
+                // Đánh dấu cập nhật
+                _unitOfWork.Repository<User>().Update(user);
+            }
+            // ---------------------------------------------
+
+            // 4. Lưu tất cả thay đổi (Order + User Update) cùng lúc
             await _unitOfWork.SaveChangesAsync();
 
+            // 5. Tạo URL thanh toán VNPay
             var paymentModel = new PaymentInformationModel
             {
                 OrderId = order.OrderID,

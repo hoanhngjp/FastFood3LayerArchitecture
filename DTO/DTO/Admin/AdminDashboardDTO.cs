@@ -17,7 +17,12 @@ namespace DTO.DTO.Admin
         public int ActiveDrones { get; set; }
 
         // Biểu đồ & Bảng
-        public List<ChartDataPoint> RevenueChart { get; set; } // Doanh thu 30 ngày
+        public List<ChartDataPoint> RevenueChart { get; set; }
+        public List<ChartDataPoint> OrderCountChart { get; set; }
+        public List<ChartDataPoint> OrderStatusChart { get; set; }
+        public List<ChartDataPoint> DroneStatusChart { get; set; }  // Idle, Busy, Maintenance...
+        public List<ChartDataPoint> DroneBatteryChart { get; set; } // Good, Medium, Low
+
         public List<TopRestaurantDTO> TopRestaurants { get; set; }
         public IEnumerable<OrderDTO> RecentOrders { get; set; }
     }

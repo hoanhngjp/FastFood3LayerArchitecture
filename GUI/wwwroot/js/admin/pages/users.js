@@ -119,23 +119,31 @@ function renderTable(users) {
     dom.tableBody.innerHTML = '';
 
     if (!users || users.length === 0) {
-        dom.tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Không tìm thấy người dùng nào.</td></tr>`;
+        dom.tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Không tìm thấy người dùng nào.</td></tr>`;
         return;
     }
 
     users.forEach(u => {
-        // Map data an toàn
+        // Map data an toàn (xử lý cả chữ hoa/thường)
         const id = u.userID || u.UserID;
         const name = u.fullName || u.FullName || 'N/A';
         const email = u.email || u.Email || 'N/A';
         const role = u.roleName || u.RoleName || 'Customer';
         const created = formatDate(u.createdAt || u.CreatedAt);
 
+        // [MỚI] Lấy số lượng đơn hàng
+        const orderCount = u.orderCount || u.OrderCount || 0;
+
         // Badge màu cho Role
         let roleBadge = 'bg-secondary';
         if (role.toLowerCase() === 'admin') roleBadge = 'bg-danger';
         else if (role.toLowerCase() === 'manager') roleBadge = 'bg-primary';
         else if (role.toLowerCase() === 'customer') roleBadge = 'bg-success';
+
+        // Logic màu sắc cho Order Count (Để cho đẹp)
+        let countClass = "text-muted";
+        if (orderCount > 0) countClass = "text-primary fw-bold";
+        if (orderCount > 10) countClass = "text-success fw-bold";
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -144,6 +152,11 @@ function renderTable(users) {
             <td>${email}</td>
             <td><span class="badge ${roleBadge}">${role}</span></td>
             <td class="text-muted small">${created}</td>
+            
+            <td class="text-center ${countClass}" style="font-size: 1.1em;">
+                ${orderCount}
+            </td>
+
             <td class="text-end pe-4">
                 <button class="btn btn-sm btn-outline-primary me-1" 
                     data-id="${id}" 
@@ -161,7 +174,6 @@ function renderTable(users) {
         dom.tableBody.appendChild(tr);
     });
 }
-
 function renderPagination(totalCount, currentPage, pageSize) {
     if (!dom.pagControls || !dom.pagInfo) return;
 

@@ -24,7 +24,9 @@ namespace BUS.Services.DashboardService
         // CẬP NHẬT: Thêm tham số restaurantId
         public async Task<AdminDashboardDTO> GetSystemOverviewAsync(int? restaurantId, string filterType, DateTime? fromDate, DateTime? toDate)
         {
-            // 1. XÁC ĐỊNH THỜI GIAN
+            // ---------------------------------------------------------
+            // 1. XÁC ĐỊNH KHOẢNG THỜI GIAN (Time Filter)
+            // ---------------------------------------------------------
             DateTime startUtc, endUtc;
             var nowUtc = DateTime.UtcNow;
 
@@ -34,7 +36,7 @@ namespace BUS.Services.DashboardService
                     if (fromDate.HasValue && toDate.HasValue)
                     {
                         startUtc = fromDate.Value.Date;
-                        endUtc = toDate.Value.Date.AddDays(1).AddTicks(-1);
+                        endUtc = toDate.Value.Date.AddDays(1).AddTicks(-1); // Cuối ngày
                     }
                     else
                     {
@@ -61,47 +63,60 @@ namespace BUS.Services.DashboardService
                     break;
             }
 
-            // --- LẤY DỮ LIỆU ---
+            // ---------------------------------------------------------
+            // 2. TRUY VẤN DỮ LIỆU (Query Data)
+            // ---------------------------------------------------------
 
-            // A. Đơn hàng (Orders) - Lọc theo Thời gian & Nhà hàng
-            var allOrdersQuery = await _uow.Orders.GetAllWithDetailsAsync(); // Lấy kèm Restaurant, Status
+            // A. Lấy Đơn hàng (Orders) - Kèm thông tin liên quan
+            // Lưu ý: GetAllWithDetailsAsync nên Include: Restaurant, OrderStatus, User
+            var allOrdersQuery = await _uow.Orders.GetAllWithDetailsAsync();
 
+            // Lọc theo thời gian
             var periodOrders = allOrdersQuery
                 .Where(o => o.OrderTime >= startUtc && o.OrderTime <= endUtc);
 
-            // [FILTER] Nếu có chọn nhà hàng
+            // Lọc theo Nhà hàng (nếu có chọn)
             if (restaurantId.HasValue && restaurantId.Value > 0)
             {
                 periodOrders = periodOrders.Where(o => o.RestaurantID == restaurantId.Value);
             }
 
-            var periodOrdersList = periodOrders.ToList(); // Execute Query
+            var periodOrdersList = periodOrders.ToList(); // Thực thi Query ra List
 
-            // B. Giao dịch (Transactions) - Phải lọc theo OrderID của tập order trên
-            // Lấy danh sách OrderID hợp lệ
+            // B. Lấy Giao dịch (Transactions) - Chỉ lấy của các đơn hàng đã lọc ở trên
             var validOrderIds = periodOrdersList.Select(o => o.OrderID).ToList();
 
             var transactions = (await _uow.Repository<PaymentTransaction>()
                 .GetAsync(filter: t => t.StatusID == PAYMENT_SUCCESS_ID
-                                       && validOrderIds.Contains(t.OrderID))) // Chỉ lấy trans của các order đã lọc
+                                       && validOrderIds.Contains(t.OrderID)))
                 .ToList();
 
-            // C. Các chỉ số Snapshot (User/Drone)
-            // Nếu chọn cụ thể 1 quán, User/Drone có thể không cần lọc (hoặc để 0 tùy nghiệp vụ).
-            // Ở đây mình giữ nguyên System Stats cho Drones, nhưng Users đếm theo đơn hàng đã lọc.
-            var totalUsers = periodOrdersList.Select(o => o.UserID).Distinct().Count();
+            // C. Lấy Danh sách Drone (Hạm đội)
+            // Drone là tài nguyên hệ thống, nhưng nếu muốn lọc theo nhà hàng thì cần logic riêng.
+            // Ở đây ta lấy TOÀN BỘ Drone để hiển thị tình trạng chung.
+            var droneList = (await _uow.Repository<Drone>()
+                .GetAsync(includeProperties: "DroneStatus"))
+                .ToList();
 
-            var drones = await _uow.Repository<Drone>().GetAsync(includeProperties: "DroneStatus");
-            var totalDrones = drones.Count(); // Drone là tài nguyên chung, không lọc theo quán
-            var activeDrones = drones.Count(d => d.DroneStatus?.StatusName != "Idle" && d.DroneStatus?.StatusName != "Maintenance");
-
-            // --- TÍNH TOÁN ---
+            // ---------------------------------------------------------
+            // 3. TÍNH TOÁN SỐ LIỆU TỔNG QUAN (Cards)
+            // ---------------------------------------------------------
 
             long totalRevenue = (long)transactions.Sum(t => t.Amount);
             int totalOrders = periodOrdersList.Count;
+            // Đếm số người dùng mua hàng trong kỳ (Distinct UserID)
+            int totalUsers = periodOrdersList.Select(o => o.UserID).Distinct().Count();
 
-            // 1. Biểu đồ Doanh thu
-            var chartData = transactions
+            int totalDrones = droneList.Count;
+            // Đếm drone đang hoạt động (không phải Idle hoặc Maintenance)
+            int activeDrones = droneList.Count(d => d.DroneStatus?.StatusName != "Idle" && d.DroneStatus?.StatusName != "Maintenance");
+
+            // ---------------------------------------------------------
+            // 4. XỬ LÝ DỮ LIỆU BIỂU ĐỒ (Charts)
+            // ---------------------------------------------------------
+
+            // [BIỂU ĐỒ 1] Doanh thu (Line Chart) - Gom nhóm theo Ngày
+            var revenueChart = transactions
                 .Where(t => t.PaymentDate.HasValue)
                 .GroupBy(t => t.PaymentDate.Value.Date)
                 .Select(g => new ChartDataPoint
@@ -112,7 +127,46 @@ namespace BUS.Services.DashboardService
                 .OrderBy(c => c.Label)
                 .ToList();
 
-            // 2. Top Nhà hàng (Nếu đã chọn 1 quán thì chỉ hiện 1 quán đó)
+            // [BIỂU ĐỒ 2] Số lượng đơn hàng (Bar Chart) - Gom nhóm theo Ngày
+            var orderCountChart = periodOrdersList
+                .GroupBy(o => o.OrderTime.Date)
+                .Select(g => new ChartDataPoint
+                {
+                    Label = g.Key.ToString("dd/MM"),
+                    Value = g.Count()
+                })
+                .OrderBy(c => c.Label)
+                .ToList();
+
+            // [BIỂU ĐỒ 3] Tỷ lệ Trạng thái Đơn hàng (Pie Chart)
+            var orderStatusChart = periodOrdersList
+                .GroupBy(o => o.OrderStatus?.StatusName ?? "Unknown")
+                .Select(g => new ChartDataPoint
+                {
+                    Label = g.Key,
+                    Value = g.Count()
+                })
+                .ToList();
+
+            // [BIỂU ĐỒ 4] Trạng thái Drone (Pie Chart)
+            var droneStatusChart = droneList
+                .GroupBy(d => d.DroneStatus?.StatusName ?? "Unknown")
+                .Select(g => new ChartDataPoint
+                {
+                    Label = g.Key,
+                    Value = g.Count()
+                })
+                .ToList();
+
+            // [BIỂU ĐỒ 5] Tình trạng Pin Drone (Bar Chart - Phân loại)
+            var droneBatteryChart = new List<ChartDataPoint>
+            {
+                new ChartDataPoint { Label = "Pin Cao (>50%)", Value = droneList.Count(d => (d.CurrentBattery ?? 0) > 50) },
+                new ChartDataPoint { Label = "Trung bình (20-50%)", Value = droneList.Count(d => (d.CurrentBattery ?? 0) <= 50 && (d.CurrentBattery ?? 0) >= 20) },
+                new ChartDataPoint { Label = "Pin Yếu (<20%)", Value = droneList.Count(d => (d.CurrentBattery ?? 0) < 20) }
+            };
+
+            // [BIỂU ĐỒ 6] Top Nhà hàng theo Doanh thu (Doughnut Chart)
             var topRes = periodOrdersList
                 .Where(o => o.OrderStatus?.StatusName == "Completed" || o.OrderStatus?.StatusName == "Delivered")
                 .GroupBy(o => o.Restaurant?.Name ?? "Unknown")
@@ -125,7 +179,9 @@ namespace BUS.Services.DashboardService
                 .Take(5)
                 .ToList();
 
-            // 3. Đơn hàng gần đây
+            // ---------------------------------------------------------
+            // 5. DANH SÁCH ĐƠN HÀNG GẦN ĐÂY (Recent Orders Table)
+            // ---------------------------------------------------------
             var recentOrders = periodOrdersList
                 .OrderByDescending(o => o.OrderTime)
                 .Take(10)
@@ -140,14 +196,26 @@ namespace BUS.Services.DashboardService
                 })
                 .ToList();
 
+            // ---------------------------------------------------------
+            // 6. TRẢ VỀ DTO
+            // ---------------------------------------------------------
             return new AdminDashboardDTO
             {
+                // Số liệu tổng
                 TotalRevenue = totalRevenue,
                 TotalOrders = totalOrders,
                 TotalUsers = totalUsers,
                 TotalDrones = totalDrones,
                 ActiveDrones = activeDrones,
-                RevenueChart = chartData,
+
+                // Dữ liệu biểu đồ
+                RevenueChart = revenueChart,
+                OrderCountChart = orderCountChart,
+                OrderStatusChart = orderStatusChart,
+                DroneStatusChart = droneStatusChart,
+                DroneBatteryChart = droneBatteryChart,
+
+                // Dữ liệu bảng & Top
                 TopRestaurants = topRes,
                 RecentOrders = recentOrders
             };

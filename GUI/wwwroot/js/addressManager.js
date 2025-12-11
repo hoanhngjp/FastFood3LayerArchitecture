@@ -315,4 +315,4 @@ document.addEventListener('DOMContentLoaded', function () {
     if (addressesTabButton && addressesTabButton.classList.contains('active')) {
         loadAddresses();
     }
-});
+});p

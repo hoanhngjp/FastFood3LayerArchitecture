@@ -113,13 +113,11 @@ namespace BUS.Services
         }
         public async Task<PagedResult<UserDTO>> GetUsersPagingAsync(UserFilterRequest request)
         {
-            // 1. Khởi tạo Query (chưa execute)
-            // Lưu ý: Cần đảm bảo Repository có trả về IQueryable. 
-            // Nếu Repository của bạn chỉ trả về IEnumerable (List), ta tạm thời phải load hết rồi lọc (không tối ưu nhưng chạy được).
-            // Giả sử UnitOfWork.Users.GetAllWithRolesAsync() trả về List.
-
-            var allUsers = await _unitOfWork.Users.GetAllWithRolesAsync();
-            var query = allUsers.AsQueryable();
+            // SỬA: Thay 'var' bằng 'IQueryable<User>'
+            // Việc này ép kiểu ngay từ đầu về IQueryable chung nhất, giúp các lệnh Where sau đó hoạt động bình thường.
+            IQueryable<User> query = _unitOfWork.Users.GetQuery()
+                            .Include(u => u.UserRole)
+                            .Include(u => u.Orders);
 
             // 2. Lọc theo Keyword
             if (!string.IsNullOrEmpty(request.Keyword))
@@ -136,12 +134,22 @@ namespace BUS.Services
             }
 
             // 4. Tính toán phân trang
-            int totalCount = query.Count();
-            var items = query
+            int totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(u => u.CreatedAt)
                 .Skip((request.PageIndex - 1) * request.PageSize)
                 .Take(request.PageSize)
-                .Select(MapToDTO)
-                .ToList();
+                .Select(u => new UserDTO
+                {
+                    UserID = u.UserID,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    RoleName = u.UserRole.RoleName,
+                    CreatedAt = u.CreatedAt,
+                    OrderCount = u.Orders.Count
+                })
+                .ToListAsync();
 
             return new PagedResult<UserDTO>
             {
@@ -151,7 +159,6 @@ namespace BUS.Services
                 PageSize = request.PageSize
             };
         }
-
         public async Task<IEnumerable<RoleDTO>> GetAllRolesAsync()
         {
             var roles = await _unitOfWork.UserRoles.GetAllAsync();
@@ -174,6 +181,7 @@ namespace BUS.Services
                 AvatarURL = u.AvatarURL,
                 CreatedAt = u.CreatedAt,
                 UpdatedAt = u.UpdatedAt,
+                OrderCount = u.Orders?.Count
             };
         }
     }

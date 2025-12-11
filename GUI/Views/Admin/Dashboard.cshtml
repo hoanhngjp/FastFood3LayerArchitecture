@@ -37,6 +37,7 @@
         </div>
     </div>
 </div>
+
 <div class="row g-4 mb-4">
     <div class="col-xl-3 col-md-6">
         <div class="card shadow-sm border-0 border-start border-4 border-primary h-100">
@@ -99,10 +100,10 @@
     <div class="col-lg-8 mb-4 mb-lg-0">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-white py-3">
-                <h6 class="mb-0 fw-bold"><i class="bi bi-graph-up-arrow me-2"></i>Xu hướng Doanh thu (30 ngày)</h6>
+                <h6 class="mb-0 fw-bold text-primary"><i class="bi bi-graph-up-arrow me-2"></i>Xu hướng Doanh thu</h6>
             </div>
             <div class="card-body">
-                <canvas id="adminRevenueChart" style="max-height: 350px;"></canvas>
+                <canvas id="adminRevenueChart" style="max-height: 300px;"></canvas>
             </div>
         </div>
     </div>
@@ -110,11 +111,65 @@
     <div class="col-lg-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-white py-3">
-                <h6 class="mb-0 fw-bold"><i class="bi bi-trophy-fill me-2"></i>Top Nhà Hàng</h6>
+                <h6 class="mb-0 fw-bold text-success"><i class="bi bi-pie-chart-fill me-2"></i>Tỷ lệ Đơn hàng</h6>
             </div>
             <div class="card-body">
-                <div style="height: 300px; position: relative;">
+                <div style="height: 250px; position: relative;">
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-8 mb-4 mb-lg-0">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold text-info"><i class="bi bi-bar-chart-fill me-2"></i>Số lượng Đơn hàng</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="orderCountChart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold text-warning"><i class="bi bi-trophy-fill me-2"></i>Top Doanh thu</h6>
+            </div>
+            <div class="card-body">
+                <div style="height: 250px; position: relative;">
                     <canvas id="topResChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold text-warning"><i class="bi bi-airplane-engines-fill me-2"></i>Trạng thái Drone</h6>
+            </div>
+            <div class="card-body">
+                <div style="height: 250px; position: relative;">
+                    <canvas id="droneStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold text-danger"><i class="bi bi-battery-charging me-2"></i>Tình trạng Pin Drone</h6>
+            </div>
+            <div class="card-body">
+                <div style="height: 250px; position: relative;">
+                    <canvas id="droneBatteryChart"></canvas>
                 </div>
             </div>
         </div>
